@@ -1,0 +1,78 @@
+{
+  "identifier" : "MG000001-STOREKIT-001",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "MG000001-0001",
+      "localizations" : [
+        {
+          "displayName" : "MsgGuard Pro",
+          "locale" : "en_US"
+        },
+        {
+          "displayName" : "MsgGuard Pro",
+          "locale" : "zh_CN"
+        }
+      ],
+      "name" : "MsgGuard Pro",
+      "subscriptions" : [
+        {
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "internalID" : "MG000001-MONTHLY",
+          "localizations" : [
+            {
+              "description" : "Monthly Pro access",
+              "displayName" : "MsgGuard Pro Monthly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "按月 Pro 权限",
+              "displayName" : "MsgGuard Pro 月度",
+              "locale" : "zh_CN"
+            }
+          ],
+          "productID" : "com.ethanshen.msgguard.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "MsgGuard Pro Monthly",
+          "subscriptionGroupID" : "MG000001-0001",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "internalID" : "MG000001-YEARLY",
+          "localizations" : [
+            {
+              "description" : "Yearly Pro access",
+              "displayName" : "MsgGuard Pro Yearly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "按年 Pro 权限",
+              "displayName" : "MsgGuard Pro 年度",
+              "locale" : "zh_CN"
+            }
+          ],
+          "productID" : "com.ethanshen.msgguard.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "MsgGuard Pro Yearly",
+          "subscriptionGroupID" : "MG000001-0001",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

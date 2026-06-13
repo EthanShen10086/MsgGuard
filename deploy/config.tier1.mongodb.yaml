@@ -1,0 +1,9 @@
+features:
+  cloud_llm: false
+database:
+  driver: mongodb
+  dsn: "mongodb://msgguard:msgguard@mongodb:27017/?authSource=admin"
+cache:
+  redis_enabled: true
+observability:
+  otel_endpoint: "jaeger:4318"

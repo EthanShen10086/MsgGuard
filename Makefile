@@ -1,7 +1,10 @@
-.PHONY: ios-test gateway backend-dev ml-train ml-benchmark docker-up tier1 verify
+.PHONY: ios-test gateway backend-dev ml-train ml-benchmark docker-up tier1 tier1-mongodb verify
 
 verify:
 	bash scripts/verify.sh
+
+tier1-mongodb:
+	bash deploy/tiers/tier1-mongodb.sh
 
 ios-test:
 	cd apps/ios/Packages/FilterEngine && swift test

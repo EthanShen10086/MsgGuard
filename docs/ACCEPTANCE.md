@@ -39,3 +39,11 @@
 - [x] Model 服务 `/api/v1/models/register` 自身 RBAC（401/201）
 - [x] iOS `EntitlementProviding` + Keychain 持久化
 - [x] `make verify` / `bash scripts/verify.sh` 全量验收
+
+## Phase 2.2 — Compose MongoDB + StoreKit
+- [x] `deploy/docker-compose.yml` 含 MongoDB 服务
+- [x] `make tier1-mongodb` / `deploy/tiers/tier1-mongodb.sh`
+- [x] `StoreManager` — 购买 / 恢复 / Transaction 监听
+- [x] `Products.storekit` 本地 StoreKit 测试配置
+- [x] Cloud LLM 需 Pro  entitlement（Settings 禁用提示）
+- [x] Cookbook 31

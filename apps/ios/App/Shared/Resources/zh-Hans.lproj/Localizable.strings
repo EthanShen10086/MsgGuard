@@ -36,6 +36,7 @@
 "settings.proActive" = "Pro 已激活";
 "settings.upgradePro" = "升级 Pro";
 "settings.privacyPolicy" = "隐私政策";
+"settings.cloudLLMProHint" = "需要 Pro 订阅";
 "samples.feed" = "投喂样本";
 "samples.paste" = "粘贴短信内容";
 "samples.label" = "标注";
@@ -75,3 +76,5 @@
 "subscription.feature.cloud" = "云端 AI 识别";
 "subscription.feature.rules" = "高级规则";
 "subscription.feature.stats" = "详细统计";
+"subscription.restore" = "恢复购买";
+"subscription.manage" = "管理订阅";

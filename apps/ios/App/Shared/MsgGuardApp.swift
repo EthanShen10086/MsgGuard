@@ -15,6 +15,7 @@ struct MsgGuardApp: App {
                 .environment(appState)
                 .task {
                     await appState.loadAll()
+                    await StoreManager.shared.refreshPurchaseState()
                     Task(priority: .utility) {
                         AnalyticsManager.shared.track(.appLaunched)
                         let sync = SyncService()

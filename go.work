@@ -7,11 +7,11 @@ use (
 	./pkg/httpauth
 	./pkg/ports
 	./services/admin
-	./services/classify
-	./services/feedback
 	./services/gateway
-	./services/model
 	./services/rules
+	./services/classify
+	./services/model
+	./services/feedback
 )
 
 replace (

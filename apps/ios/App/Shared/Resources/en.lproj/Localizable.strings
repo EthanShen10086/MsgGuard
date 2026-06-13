@@ -36,6 +36,7 @@
 "settings.proActive" = "Pro Active";
 "settings.upgradePro" = "Upgrade to Pro";
 "settings.privacyPolicy" = "Privacy Policy";
+"settings.cloudLLMProHint" = "Requires Pro subscription";
 "samples.feed" = "Feed Sample";
 "samples.paste" = "Paste SMS text";
 "samples.label" = "Label";
@@ -75,3 +76,5 @@
 "subscription.feature.cloud" = "Cloud AI classification";
 "subscription.feature.rules" = "Advanced rules";
 "subscription.feature.stats" = "Detailed statistics";
+"subscription.restore" = "Restore Purchases";
+"subscription.manage" = "Manage Subscription";

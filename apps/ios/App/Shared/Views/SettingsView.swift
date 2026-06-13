@@ -18,10 +18,17 @@ struct SettingsView: View {
                     Toggle(String(localized: "settings.cloudLLM"), isOn: Binding(
                         get: { appState.filterConfig.cloudLLMEnabled },
                         set: {
+                            guard appState.isPro else { return }
                             appState.filterConfig.cloudLLMEnabled = $0
                             Task { await appState.saveConfig() }
                         }
                     ))
+                    .disabled(!appState.isPro)
+                    if !appState.isPro {
+                        Text(String(localized: "settings.cloudLLMProHint"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 Section(String(localized: "settings.accessibility")) {
                     Picker(String(localized: "settings.userMode"), selection: Binding(
@@ -38,10 +45,16 @@ struct SettingsView: View {
                 Section(String(localized: "settings.subscription")) {
                     if appState.isPro {
                         Text(String(localized: "settings.proActive"))
+                        Button(String(localized: "subscription.manage")) {
+                            Task { await StoreManager.shared.openManageSubscriptions() }
+                        }
                     } else {
                         NavigationLink(String(localized: "settings.upgradePro")) {
                             SubscriptionView()
                         }
+                    }
+                    Button(String(localized: "subscription.restore")) {
+                        Task { await StoreManager.shared.restorePurchases() }
                     }
                 }
                 Section {
