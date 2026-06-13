@@ -43,3 +43,10 @@ Only change `deploy/config.*.yaml` and run matching `deploy/tiers/*.sh` — no b
 - [x] NATS flywheel worker (`services/flywheel`) + feedback trigger publish
 - [x] Tier matrix (`docs/deploy/TIER_MATRIX.md`), `values-prod.yaml`, caddy-site in compose
 - [x] App Store ship assets (`ASC_CHECKLIST.md`, `SCREENSHOTS.md`, `fastlane/Fastfile`)
+
+## Phase 2.6 — P2/P3 Long-term
+- [x] Shadow Prometheus + Grafana provisioning + admin shadow stats
+- [x] Rules CDN ETag/304 + version routes + iOS incremental sync
+- [x] Multi-locale model publish + per-locale CoreML OTA paths
+- [x] iCloud autoSync (KV store) + CallDirectory extension skeleton
+- [x] cert-manager Helm Certificate templates

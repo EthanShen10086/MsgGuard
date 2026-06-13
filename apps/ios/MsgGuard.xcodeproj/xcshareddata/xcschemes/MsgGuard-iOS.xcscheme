@@ -16,6 +16,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1885BAB69D1C92D7B2164CA6"
+               BuildableName = "CallDirectoryExtension.appex"
+               BlueprintName = "CallDirectoryExtension"
+               ReferencedContainer = "container:MsgGuard.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "FE909379D9645D546E55D301"
                BuildableName = "MessageFilterExtension.appex"
                BlueprintName = "MessageFilterExtension"
@@ -61,9 +75,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FE909379D9645D546E55D301"
-            BuildableName = "MessageFilterExtension.appex"
-            BlueprintName = "MessageFilterExtension"
+            BlueprintIdentifier = "1885BAB69D1C92D7B2164CA6"
+            BuildableName = "CallDirectoryExtension.appex"
+            BlueprintName = "CallDirectoryExtension"
             ReferencedContainer = "container:MsgGuard.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -87,9 +101,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FE909379D9645D546E55D301"
-            BuildableName = "MessageFilterExtension.appex"
-            BlueprintName = "MessageFilterExtension"
+            BlueprintIdentifier = "1885BAB69D1C92D7B2164CA6"
+            BuildableName = "CallDirectoryExtension.appex"
+            BlueprintName = "CallDirectoryExtension"
             ReferencedContainer = "container:MsgGuard.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -106,9 +120,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FE909379D9645D546E55D301"
-            BuildableName = "MessageFilterExtension.appex"
-            BlueprintName = "MessageFilterExtension"
+            BlueprintIdentifier = "1885BAB69D1C92D7B2164CA6"
+            BuildableName = "CallDirectoryExtension.appex"
+            BlueprintName = "CallDirectoryExtension"
             ReferencedContainer = "container:MsgGuard.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

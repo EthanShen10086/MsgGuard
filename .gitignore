@@ -21,6 +21,8 @@ deploy/models/registry.json
 # Go build artifacts
 **/server
 !services/*/cmd/server/
+services/flywheel/worker
+**/flywheel/worker
 
 # Keep seed and benchmark test sets
 !ml/datasets/

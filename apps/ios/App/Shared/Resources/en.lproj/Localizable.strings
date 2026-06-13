@@ -34,6 +34,12 @@
 "settings.extensionEnabled" = "Filter Enabled";
 "settings.privacy" = "Privacy";
 "settings.cloudLLM" = "Cloud AI (opt-in)";
+"settings.cloudLLMProHint" = "Cloud AI requires MsgGuard Pro.";
+"settings.sync" = "Sync";
+"settings.iCloudSync" = "iCloud Rules Sync";
+"settings.iCloudSyncProHint" = "Cross-device sync requires MsgGuard Pro.";
+"settings.callDirectory" = "Call Directory";
+"settings.callDirectoryHint" = "Enable Call Blocking & Identification in iOS Settings to block known spam numbers from MsgGuard.";
 "settings.accessibility" = "Accessibility";
 "settings.userMode" = "User Mode";
 "settings.subscription" = "Subscription";

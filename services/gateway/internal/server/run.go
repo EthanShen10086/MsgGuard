@@ -37,11 +37,11 @@ func Run(c *mgapp.Container) error {
 	)
 	feedbackHandler := handler.NewFeedbackHandler(c.Log, c.FeedbackStore, c.AuditWriter, c.Queue)
 	analyticsHandler := handler.NewAnalyticsHandler(c.Log, c.AnalyticsStore)
-	shadowHandler := handler.NewShadowHandler(c.Log, classifyHandler)
-	rulesHandler := handler.NewRulesHandler(c.RuleStore)
+	shadowHandler := handler.NewShadowHandler(c.Log, classifyHandler, c.FlagStore)
+	rulesHandler := handler.NewRulesHandler(c.RuleStore, c.Authenticator, c.Authorizer)
 	adminHandler := handler.NewAdminHandler(
 		c.Log, c.AnalyticsStore, c.FeedbackStore, c.Authenticator, c.Authorizer,
-		c.QuotaStore, c.FlagStore,
+		c.QuotaStore, c.FlagStore, shadowHandler,
 	)
 
 	mux := http.NewServeMux()
@@ -54,6 +54,8 @@ func Run(c *mgapp.Container) error {
 	mux.HandleFunc("/api/v1/classify/defer", classifyHandler.Defer)
 	mux.HandleFunc("/api/v1/classify", classifyHandler.Classify)
 	mux.HandleFunc("/api/v1/classify/shadow", shadowHandler.Compare)
+	mux.HandleFunc("/api/v1/admin/shadow/stats", adminHandler.ShadowStats)
+	mux.HandleFunc("/metrics/shadow", shadowHandler.Prometheus)
 	mux.HandleFunc("/api/v1/feedback", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			claims, err := authenticate(c, r)
@@ -73,6 +75,8 @@ func Run(c *mgapp.Container) error {
 	})
 	mux.HandleFunc("/api/v1/analytics", analyticsHandler.Ingest)
 	mux.HandleFunc("/api/v1/rules/latest", rulesHandler.Latest)
+	mux.HandleFunc("/api/v1/rules/register", rulesHandler.Register)
+	mux.HandleFunc("/api/v1/rules/", rulesHandler.ByVersion)
 	mux.HandleFunc("/api/v1/admin/metrics/summary", adminHandler.MetricsSummary)
 	mux.HandleFunc("/api/v1/admin/quota/whitelist", adminHandler.QuotaWhitelist)
 	mux.HandleFunc("/api/v1/admin/flags", adminHandler.FeatureFlags)

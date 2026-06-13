@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -101,6 +102,22 @@ func (s *RuleStore) GetLatest(ctx context.Context) (*ports.RuleBundle, error) {
 	err := s.col.FindOne(ctx, bson.M{}, opts).Decode(&doc)
 	if err == mongo.ErrNoDocuments {
 		return &ports.RuleBundle{Version: "1.0.0", Checksum: "seed", Payload: []byte(`{"keywords":["免费"]}`)}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &ports.RuleBundle{Version: doc.Version, Checksum: doc.Checksum, Payload: doc.Payload}, nil
+}
+
+func (s *RuleStore) GetByVersion(ctx context.Context, version string) (*ports.RuleBundle, error) {
+	var doc struct {
+		Version  string `bson:"version"`
+		Checksum string `bson:"checksum"`
+		Payload  []byte `bson:"payload"`
+	}
+	err := s.col.FindOne(ctx, bson.M{"version": version}).Decode(&doc)
+	if err == mongo.ErrNoDocuments {
+		return nil, fmt.Errorf("version not found")
 	}
 	if err != nil {
 		return nil, err

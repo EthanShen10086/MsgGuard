@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish trained model to backend model service."""
+"""Publish trained models for all supported locales."""
 import hashlib
 import json
 import os
@@ -8,27 +8,35 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 OUTPUT = ROOT / "output"
-URL = os.environ.get("MODEL_URL", "http://localhost:8083") + "/api/v1/models/register"
+BASE = os.environ.get("MODEL_URL", "http://localhost:8083")
+LOCALES = os.environ.get("MODEL_LOCALES", "zh-Hans,en-US").split(",")
 
 
-def main():
+def publish_locale(locale: str) -> None:
     artifacts = []
     for name in ["bayes_pipeline.joblib", "coreml_pipeline.joblib", "spam_classifier.mlmodel"]:
         path = OUTPUT / name
         if path.exists():
             h = hashlib.sha256(path.read_bytes()).hexdigest()
             artifacts.append({"name": name, "checksum": f"sha256:{h}", "size": path.stat().st_size})
-    payload = {"version": "1.0.0", "locale": "zh-Hans", "artifacts": artifacts}
+    payload = {"version": "1.0.0", "locale": locale.strip(), "artifacts": artifacts}
+    url = BASE + "/api/v1/models/register"
     req = urllib.request.Request(
-        URL, data=json.dumps(payload).encode(),
+        url, data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json"}, method="POST",
     )
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
-            print(resp.read().decode())
+            print(f"{locale}: {resp.read().decode()}")
     except Exception as e:
-        print(f"publish_to_backend: saved locally ({e})")
-        (OUTPUT / "publish_manifest.json").write_text(json.dumps(payload, indent=2))
+        print(f"{locale}: saved locally ({e})")
+        (OUTPUT / f"publish_manifest_{locale.strip()}.json").write_text(json.dumps(payload, indent=2))
+
+
+def main():
+    for locale in LOCALES:
+        if locale.strip():
+            publish_locale(locale)
 
 
 if __name__ == "__main__":

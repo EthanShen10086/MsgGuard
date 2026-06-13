@@ -19,3 +19,8 @@ security:
   mtlsClientHeader: "X-Client-Cert-Subject"
 config:
   cloudLLM: true
+certManager:
+  enabled: true
+  email: ops@msgguard.app
+  clientCA:
+    enabled: true

@@ -29,7 +29,7 @@ final class AppState {
             if let modelData = try await store.loadBayesModel() {
                 engine.loadBayesModel(from: modelData)
             }
-            if let url = try? await store.coreMLCompiledURL(),
+            if let url = try? await store.coreMLCompiledURL(locale: filterConfig.locale),
                FileManager.default.fileExists(atPath: url.path) {
                 engine.loadCoreML(from: url)
             }
@@ -41,6 +41,9 @@ final class AppState {
     func saveConfig() async {
         do {
             try await store.saveConfig(filterConfig)
+            if filterConfig.iCloudSyncEnabled, EntitlementManager.shared.hasEntitlement(.autoSync) {
+                await CloudSyncService.shared.pushConfig(filterConfig)
+            }
             if let modelData = engine.exportBayesModel() {
                 try await store.saveBayesModel(modelData)
             }

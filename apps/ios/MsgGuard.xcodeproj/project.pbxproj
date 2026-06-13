@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05DB3C589ABB12A249DC589C /* SharedModels in Frameworks */ = {isa = PBXBuildFile; productRef = 2FB595A2832FE54659D4952B /* SharedModels */; };
 		10A913A2F8BAD565654897DC /* MessageFilterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3438A47CCD54D76DD0C28EA7 /* MessageFilterExtension.swift */; };
 		14026756C83C9B935F67B9CF /* RulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978AE4209477FBDFF297BBD4 /* RulesView.swift */; };
 		1C72FC65EFBC1CC7D2B1622B /* MsgGuardWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C3A993B71E510CEB403DAC45 /* MsgGuardWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -25,12 +26,15 @@
 		70B6C051BDDBBB948E450A9B /* AnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13C0DD53A5CAF51235487984 /* AnalyticsManager.swift */; };
 		77665894BBBE75670514BA3B /* MGLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090E22609FFFD0A15C542CA2 /* MGLogger.swift */; };
 		7A2E506953897DF287CA8B0D /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609A7B810C7859B5B7E51DEB /* StoreManager.swift */; };
+		7D066A1C5FFEF20F045FC192 /* CloudSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDAA45B9D2855A4386486B3 /* CloudSyncService.swift */; };
 		825A67ED99BA048932D08134 /* MsgGuardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BD216D24BCC7A48848CB3B /* MsgGuardWidget.swift */; };
+		82C9CCB06EBCA78482C2C937 /* CallDirectoryHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C1BEC87BB40B6EB187E5C7 /* CallDirectoryHandler.swift */; };
 		85472DACD8F92007AF3DAD95 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7803C36B970B7B4DE154C7B6 /* StatsView.swift */; };
 		877A096741995E828D2F1F1B /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E75FE5FFF18C7E4FA46210 /* HelpView.swift */; };
 		8DB8B0411244AA715E41FBDA /* MessageFilterExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E69F688281CAB9CAA780C39 /* MessageFilterExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		98D6D2D30F8FE4FA4D129E4D /* PerformanceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C2D61AA6FD314CDA48486 /* PerformanceMonitor.swift */; };
 		98F0D14E13983ECAFAB93FCB /* SharedModels in Frameworks */ = {isa = PBXBuildFile; productRef = 04360C9A0761CEB309D5CB1F /* SharedModels */; };
+		9BAEA9D8F32282A560CB5AC2 /* CallDirectoryExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 07657297AAE333C0239C12C5 /* CallDirectoryExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A409A4B2455DAF3A165609AE /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EDA75F005C377ED44C84EE /* SubscriptionView.swift */; };
 		A48D880179400BB3A8C1322D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDE61278BE8CA808D8CE797 /* AppState.swift */; };
 		ACE2C8C76F431B7DD4CFE41B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C626989D27EF5318B2426822 /* OnboardingView.swift */; };
@@ -60,6 +64,13 @@
 			remoteGlobalIDString = FE909379D9645D546E55D301;
 			remoteInfo = MessageFilterExtension;
 		};
+		B1E7C0A906481796250D1894 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D5053812A04CA1F58C0FF70E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1885BAB69D1C92D7B2164CA6;
+			remoteInfo = CallDirectoryExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -71,6 +82,7 @@
 			files = (
 				8DB8B0411244AA715E41FBDA /* MessageFilterExtension.appex in Embed Foundation Extensions */,
 				1C72FC65EFBC1CC7D2B1622B /* MsgGuardWidget.appex in Embed Foundation Extensions */,
+				9BAEA9D8F32282A560CB5AC2 /* CallDirectoryExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -79,8 +91,11 @@
 
 /* Begin PBXFileReference section */
 		04D0DC8F91175985370061C8 /* EntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
+		07657297AAE333C0239C12C5 /* CallDirectoryExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CallDirectoryExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0826E774FA3D1ECC950EE73C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		08C4A30C6927AB188FBED9D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		090E22609FFFD0A15C542CA2 /* MGLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLogger.swift; sourceTree = "<group>"; };
+		0BDAA45B9D2855A4386486B3 /* CloudSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncService.swift; sourceTree = "<group>"; };
 		0C44C6982690CE1DCB051E2C /* SharedModels */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SharedModels; path = Packages/SharedModels; sourceTree = SOURCE_ROOT; };
 		0D37935CEE0452D32D215998 /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
 		0E9577F4AE88913F20ED43D7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -88,6 +103,7 @@
 		192971F34900E9A751B11DBE /* SamplesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplesView.swift; sourceTree = "<group>"; };
 		1A4CF53A0FF71F6D7078C5CE /* FilterEngine */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FilterEngine; path = Packages/FilterEngine; sourceTree = SOURCE_ROOT; };
 		1F1B0DB1DB21CC0DD9B95CB6 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		229F54A4FD94A769D1C41A95 /* CallDirectory.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CallDirectory.entitlements; sourceTree = "<group>"; };
 		2368DC1EB8030EF4D2B81ED7 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		3438A47CCD54D76DD0C28EA7 /* MessageFilterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageFilterExtension.swift; sourceTree = "<group>"; };
 		357FE153D0CC56FC5B7E14CC /* MsgGuard-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "MsgGuard-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +120,7 @@
 		8E69F688281CAB9CAA780C39 /* MessageFilterExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = MessageFilterExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		978AE4209477FBDFF297BBD4 /* RulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesView.swift; sourceTree = "<group>"; };
 		A6770421CC37A0F670549A57 /* ModelUpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelUpdateService.swift; sourceTree = "<group>"; };
+		A9C1BEC87BB40B6EB187E5C7 /* CallDirectoryHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallDirectoryHandler.swift; sourceTree = "<group>"; };
 		B2BD216D24BCC7A48848CB3B /* MsgGuardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MsgGuardWidget.swift; sourceTree = "<group>"; };
 		BE3FA721B22F21F823C16736 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C3A993B71E510CEB403DAC45 /* MsgGuardWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = MsgGuardWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -120,6 +137,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0CBFAAA8ED8596A52B38776D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05DB3C589ABB12A249DC589C /* SharedModels in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6B1FAB1D6FC8B1AA4A24DCD4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -180,6 +205,7 @@
 		3036E52BE9E75E60B0B285F7 = {
 			isa = PBXGroup;
 			children = (
+				49BEA250AFD359C05809AAE2 /* CallDirectoryExtension */,
 				32721D15E7137252FF9F51B7 /* iOS */,
 				2BEE7F8B77408911610BB52A /* MessageFilterExtension */,
 				135EDF0CE4EE28D7D1A38F38 /* MsgGuardWidget */,
@@ -214,6 +240,16 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		49BEA250AFD359C05809AAE2 /* CallDirectoryExtension */ = {
+			isa = PBXGroup;
+			children = (
+				229F54A4FD94A769D1C41A95 /* CallDirectory.entitlements */,
+				A9C1BEC87BB40B6EB187E5C7 /* CallDirectoryHandler.swift */,
+				08C4A30C6927AB188FBED9D8 /* Info.plist */,
+			);
+			path = CallDirectoryExtension;
+			sourceTree = "<group>";
+		};
 		628F2D764060B24FC1B260B6 /* Store */ = {
 			isa = PBXGroup;
 			children = (
@@ -239,6 +275,7 @@
 		A543AA7712F0FF87013DBEC4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				07657297AAE333C0239C12C5 /* CallDirectoryExtension.appex */,
 				8E69F688281CAB9CAA780C39 /* MessageFilterExtension.appex */,
 				357FE153D0CC56FC5B7E14CC /* MsgGuard-iOS.app */,
 				C3A993B71E510CEB403DAC45 /* MsgGuardWidget.appex */,
@@ -250,6 +287,7 @@
 			isa = PBXGroup;
 			children = (
 				2368DC1EB8030EF4D2B81ED7 /* APIClient.swift */,
+				0BDAA45B9D2855A4386486B3 /* CloudSyncService.swift */,
 				A6770421CC37A0F670549A57 /* ModelUpdateService.swift */,
 				4FC132877AAA4304B79E7A7F /* NetworkClient.swift */,
 				0D37935CEE0452D32D215998 /* SyncService.swift */,
@@ -296,6 +334,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1885BAB69D1C92D7B2164CA6 /* CallDirectoryExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE3AFB4DF5A4487ECAF1693D /* Build configuration list for PBXNativeTarget "CallDirectoryExtension" */;
+			buildPhases = (
+				E2528399BA752F964C31B777 /* Sources */,
+				0CBFAAA8ED8596A52B38776D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CallDirectoryExtension;
+			packageProductDependencies = (
+				2FB595A2832FE54659D4952B /* SharedModels */,
+			);
+			productName = CallDirectoryExtension;
+			productReference = 07657297AAE333C0239C12C5 /* CallDirectoryExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		EE43EE5905697C4F2D0207E0 /* MsgGuardWidget */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7EDD157DC150D9482149E8AF /* Build configuration list for PBXNativeTarget "MsgGuardWidget" */;
@@ -329,6 +386,7 @@
 			dependencies = (
 				7809C3E4096770F6A3B17CC0 /* PBXTargetDependency */,
 				DFEE36CBE743F43DCEB4A131 /* PBXTargetDependency */,
+				778007E58C0406EF14BC7D22 /* PBXTargetDependency */,
 			);
 			name = "MsgGuard-iOS";
 			packageProductDependencies = (
@@ -370,6 +428,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					1885BAB69D1C92D7B2164CA6 = {
+						ProvisioningStyle = Automatic;
+					};
 					EE43EE5905697C4F2D0207E0 = {
 						ProvisioningStyle = Automatic;
 					};
@@ -402,6 +463,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				1885BAB69D1C92D7B2164CA6 /* CallDirectoryExtension */,
 				FE909379D9645D546E55D301 /* MessageFilterExtension */,
 				EEC563D170BBB4BDD1AFDD27 /* MsgGuard-iOS */,
 				EE43EE5905697C4F2D0207E0 /* MsgGuardWidget */,
@@ -445,6 +507,7 @@
 				D7280040265324B316074E8E /* APIClient.swift in Sources */,
 				70B6C051BDDBBB948E450A9B /* AnalyticsManager.swift in Sources */,
 				A48D880179400BB3A8C1322D /* AppState.swift in Sources */,
+				7D066A1C5FFEF20F045FC192 /* CloudSyncService.swift in Sources */,
 				378CC2F3550A0D4BF68E58E0 /* ContentView.swift in Sources */,
 				41EC397F81A06B08046BFB73 /* CrashReporter.swift in Sources */,
 				64E9BB5167612740CFD97C9C /* DashboardView.swift in Sources */,
@@ -468,9 +531,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E2528399BA752F964C31B777 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82C9CCB06EBCA78482C2C937 /* CallDirectoryHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		778007E58C0406EF14BC7D22 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1885BAB69D1C92D7B2164CA6 /* CallDirectoryExtension */;
+			targetProxy = B1E7C0A906481796250D1894 /* PBXContainerItemProxy */;
+		};
 		7809C3E4096770F6A3B17CC0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = FE909379D9645D546E55D301 /* MessageFilterExtension */;
@@ -665,6 +741,23 @@
 			};
 			name = Release;
 		};
+		AF494EC9BC9F68F50949C627 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CallDirectoryExtension/CallDirectory.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = CallDirectoryExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.calldirectory;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		E0EFAC3A05FBC6B35C342978 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -723,6 +816,23 @@
 			};
 			name = Release;
 		};
+		EAD02319C9E75DCA53A39E4C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CallDirectoryExtension/CallDirectory.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = CallDirectoryExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.calldirectory;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -749,6 +859,15 @@
 			buildConfigurations = (
 				1B65B495340034BAFD5A7399 /* Debug */,
 				2C76EE5873EC83778989C255 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BE3AFB4DF5A4487ECAF1693D /* Build configuration list for PBXNativeTarget "CallDirectoryExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF494EC9BC9F68F50949C627 /* Debug */,
+				EAD02319C9E75DCA53A39E4C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -785,6 +904,10 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		04360C9A0761CEB309D5CB1F /* SharedModels */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedModels;
+		};
+		2FB595A2832FE54659D4952B /* SharedModels */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedModels;
 		};

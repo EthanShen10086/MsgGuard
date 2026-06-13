@@ -10,5 +10,6 @@ type RuleBundle struct {
 
 type RuleStore interface {
 	GetLatest(ctx context.Context) (*RuleBundle, error)
+	GetByVersion(ctx context.Context, version string) (*RuleBundle, error)
 	Save(ctx context.Context, bundle RuleBundle) error
 }

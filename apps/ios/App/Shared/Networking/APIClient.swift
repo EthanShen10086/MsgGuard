@@ -29,6 +29,11 @@ public struct ClassifyResponse: Codable, Sendable {
     public let confidence: Double
 }
 
+public enum APIFetchResult: Sendable {
+    case data(Data)
+    case notModified
+}
+
 public actor APIClient {
     public static let shared = APIClient()
 
@@ -65,5 +70,35 @@ public actor APIClient {
             TraceContext.update(returnedTrace)
         }
         return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    public func fetch(_ endpoint: APIEndpoint, ifNoneMatch: String? = nil) async throws -> APIFetchResult {
+        let traceID = UUID().uuidString
+        lastTraceID = traceID
+
+        var request = URLRequest(url: baseURL.appendingPathComponent(endpoint.path))
+        request.httpMethod = endpoint.method
+        request.httpBody = endpoint.body
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(traceID, forHTTPHeaderField: "X-Request-ID")
+        if let etag = ifNoneMatch, !etag.isEmpty {
+            request.setValue("\"\(etag)\"", forHTTPHeaderField: "If-None-Match")
+        }
+
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw MGError.network(.serverError)
+        }
+        if http.statusCode == 304 {
+            return .notModified
+        }
+        guard (200 ... 299).contains(http.statusCode) else {
+            throw MGError.network(.serverError)
+        }
+        if let returnedTrace = http.value(forHTTPHeaderField: "X-Request-ID") {
+            lastTraceID = returnedTrace
+            TraceContext.update(returnedTrace)
+        }
+        return .data(data)
     }
 }

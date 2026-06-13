@@ -70,3 +70,12 @@
 - [x] NATS flywheel worker + feedback trigger
 - [x] Tier matrix doc + values-prod + caddy-site in compose
 - [x] ASC checklist + Fastfile + screenshots guide
+
+## Phase 2.6 — P2/P3 Long-term Items
+- [x] Shadow mode Prometheus metrics + admin stats + Grafana provisioning
+- [x] Rules CDN: ETag/304, version routes, iOS incremental sync, sync-rules.sh
+- [x] Multi-locale model publish + iOS dynamic locale OTA paths
+- [x] iCloud autoSync (NSUbiquitousKeyValueStore) + Pro gating
+- [x] CallDirectory extension skeleton + Settings guidance
+- [x] cert-manager Helm Certificate templates (prod values)
+- [x] flywheel worker binary removed from git + .gitignore

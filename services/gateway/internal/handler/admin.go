@@ -22,6 +22,7 @@ type AdminHandler struct {
 	authorizer    auth.Authorizer
 	quota         aiquota.Manager
 	flags         featureflag.Store
+	shadow        *ShadowHandler
 }
 
 func NewAdminHandler(
@@ -32,11 +33,12 @@ func NewAdminHandler(
 	authorizer auth.Authorizer,
 	quota aiquota.Manager,
 	flags featureflag.Store,
+	shadow *ShadowHandler,
 ) *AdminHandler {
 	return &AdminHandler{
 		log: log, analytics: analytics, feedback: feedback,
 		authenticator: authenticator, authorizer: authorizer,
-		quota: quota, flags: flags,
+		quota: quota, flags: flags, shadow: shadow,
 	}
 }
 
@@ -82,12 +84,27 @@ func (h *AdminHandler) MetricsSummary(w http.ResponseWriter, r *http.Request) {
 	since := time.Now().Add(-7 * 24 * time.Hour)
 	counts, _ := h.analytics.CountByName(r.Context(), since)
 	feedback, _ := h.feedback.List(r.Context(), 1000)
+	stats := shadowStatsSnapshot()
 	writeJSON(w, map[string]any{
-		"period_days":    7,
-		"event_counts":   counts,
-		"feedback_total": len(feedback),
-		"generated_at":   time.Now().UTC(),
+		"period_days":           7,
+		"event_counts":          counts,
+		"feedback_total":        len(feedback),
+		"shadow_total":          stats["total"],
+		"shadow_disagree_rate":  stats["shadow_disagree_rate"],
+		"generated_at":          time.Now().UTC(),
 	})
+}
+
+func (h *AdminHandler) ShadowStats(w http.ResponseWriter, r *http.Request) {
+	if err := h.requireAdmin(r); err != nil {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	if h.shadow != nil {
+		h.shadow.Stats(w, r)
+		return
+	}
+	writeJSON(w, shadowStatsSnapshot())
 }
 
 func (h *AdminHandler) QuotaWhitelist(w http.ResponseWriter, r *http.Request) {

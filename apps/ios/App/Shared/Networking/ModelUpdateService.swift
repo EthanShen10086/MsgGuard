@@ -15,16 +15,17 @@ actor ModelUpdateService {
         let url: String
     }
 
-    func checkAndUpdate() async throws {
-        let meta: ModelMeta = try await client.request(
-            APIEndpoint(path: "/api/v1/models/latest?locale=zh-Hans")
-        )
+    func checkAndUpdate(locale: String? = nil) async throws {
         let config = try await store.loadConfig()
-        if config.modelVersion == meta.version, await store.hasCoreMLModel() {
-            MGLogger.sync.info("Model up to date \(meta.version)")
+        let activeLocale = locale ?? config.locale
+        let meta: ModelMeta = try await client.request(
+            APIEndpoint(path: "/api/v1/models/latest?locale=\(activeLocale.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? activeLocale)")
+        )
+        if config.modelVersion == meta.version, await store.hasCoreMLModel(locale: activeLocale) {
+            MGLogger.sync.info("Model up to date \(meta.version) locale=\(activeLocale)")
             return
         }
-        MGLogger.sync.info("Updating model to \(meta.version)")
+        MGLogger.sync.info("Updating model to \(meta.version) locale=\(activeLocale)")
         let artifactURL = resolveURL(meta.url)
         var request = URLRequest(url: artifactURL)
         request.httpMethod = "GET"
@@ -38,12 +39,13 @@ actor ModelUpdateService {
             MGLogger.sync.error("Model checksum mismatch")
             throw MGError.network(.serverError)
         }
-        let rawURL = try await store.saveRawCoreMLModel(data)
-        let compiled = try store.coreMLCompiledURL()
+        let rawURL = try await store.saveRawCoreMLModel(data, locale: activeLocale)
+        let compiled = try await store.coreMLCompiledURL(locale: activeLocale)
         try CoreMLModelCompiler.compileAndInstall(rawModelURL: rawURL, destinationURL: compiled)
         try? FileManager.default.removeItem(at: rawURL)
         var updated = config
         updated.modelVersion = meta.version
+        updated.locale = activeLocale
         try await store.saveConfig(updated)
         WidgetCenter.shared.reloadAllTimelines()
     }

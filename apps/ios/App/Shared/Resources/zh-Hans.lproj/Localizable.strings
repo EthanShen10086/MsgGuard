@@ -32,6 +32,12 @@
 "settings.extensionEnabled" = "过滤器已启用";
 "settings.privacy" = "隐私";
 "settings.cloudLLM" = "云端 AI（可选）";
+"settings.cloudLLMProHint" = "需要 Pro 订阅";
+"settings.sync" = "同步";
+"settings.iCloudSync" = "iCloud 规则同步";
+"settings.iCloudSyncProHint" = "跨设备同步需要 MsgGuard Pro。";
+"settings.callDirectory" = "来电识别";
+"settings.callDirectoryHint" = "在 iOS 设置 → 电话 → 来电阻止与身份识别 中启用 MsgGuard，以拦截已知骚扰号码。";
 "settings.accessibility" = "无障碍";
 "settings.userMode" = "用户模式";
 "settings.subscription" = "订阅";

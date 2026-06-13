@@ -4,3 +4,7 @@ scrape_configs:
   - job_name: msgguard-gateway
     static_configs:
       - targets: ["gateway:8080"]
+  - job_name: msgguard-shadow
+    metrics_path: /metrics/shadow
+    static_configs:
+      - targets: ["gateway:8080"]

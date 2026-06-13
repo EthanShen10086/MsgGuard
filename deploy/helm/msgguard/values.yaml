@@ -32,3 +32,12 @@ security:
   mtlsClientHeader: ""
 config:
   cloudLLM: false
+certManager:
+  enabled: false
+  acmeServer: https://acme-v02.api.letsencrypt.org/directory
+  email: ops@msgguard.app
+  tlsSecretName: msgguard-tls
+  clientCA:
+    enabled: false
+    secretName: msgguard-mtls-ca
+    issuerName: ca-issuer

@@ -61,6 +61,9 @@ public struct FilterConfig: Codable, Sendable, Equatable {
     public var otpProtectionEnabled: Bool
     public var locale: String
     public var modelVersion: String
+    public var rulesVersion: String
+    public var rulesChecksum: String
+    public var iCloudSyncEnabled: Bool
 
     public init(
         enabledTags: Set<FilterTag> = Set(FilterTag.allCases),
@@ -68,7 +71,10 @@ public struct FilterConfig: Codable, Sendable, Equatable {
         cloudLLMEnabled: Bool = false,
         otpProtectionEnabled: Bool = true,
         locale: String = "zh-Hans",
-        modelVersion: String = "1.0.0"
+        modelVersion: String = "1.0.0",
+        rulesVersion: String = "1.0.0",
+        rulesChecksum: String = "",
+        iCloudSyncEnabled: Bool = false
     ) {
         self.enabledTags = enabledTags
         self.rules = rules
@@ -76,6 +82,9 @@ public struct FilterConfig: Codable, Sendable, Equatable {
         self.otpProtectionEnabled = otpProtectionEnabled
         self.locale = locale
         self.modelVersion = modelVersion
+        self.rulesVersion = rulesVersion
+        self.rulesChecksum = rulesChecksum
+        self.iCloudSyncEnabled = iCloudSyncEnabled
     }
 }
 

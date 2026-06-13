@@ -1,11 +1,43 @@
 {
-  "title": "MsgGuard Product Metrics",
+  "uid": "msgguard-product",
+  "title": "MsgGuard Product",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
   "panels": [
-    {"type": "stat", "title": "App Launches (7d)", "targets": [{"expr": "sum(analytics_events{name=\"app_launched\"})"}]},
-    {"type": "graph", "title": "Filter Completed by Layer", "targets": [{"expr": "sum by (layer) (analytics_filter_completed)"}]},
-    {"type": "graph", "title": "False Positive Rate Trend", "targets": [{"expr": "benchmark_fpr"}]},
-    {"type": "graph", "title": "Shadow Disagree Rate", "targets": [{"expr": "shadow_disagree_rate"}]},
-    {"type": "stat", "title": "Purchases (7d)", "targets": [{"expr": "sum(analytics_events{name=\"purchase_completed\"})"}]},
-    {"type": "stat", "title": "Feedback Total", "targets": [{"expr": "feedback_total"}]}
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Shadow Disagree Rate",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "targets": [
+        {"expr": "shadow_disagree_rate", "legendFormat": "rate"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 0.1},
+              {"color": "red", "value": 0.25}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Shadow Comparisons",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "targets": [
+        {"expr": "shadow_total", "legendFormat": "total"},
+        {"expr": "shadow_disagree_total", "legendFormat": "disagree"}
+      ]
+    }
   ]
 }

@@ -153,6 +153,16 @@ if test -x deploy/mtls/gen-certs.sh && test -f pkg/httpauth/clientcert.go; then
 else
   fail "mtls assets"
 fi
+if test -f deploy/grafana/provisioning/datasources/prometheus.yml; then
+  ok "grafana provisioning"
+else
+  fail "grafana provisioning"
+fi
+if test -f deploy/helm/msgguard/templates/cert-manager/certificate.yaml; then
+  ok "cert-manager helm template"
+else
+  fail "cert-manager helm template"
+fi
 if (cd pkg/httpauth && go test ./...); then
   ok "httpauth mTLS tests"
 else

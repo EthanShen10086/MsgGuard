@@ -55,19 +55,21 @@ public actor BlocklistStore {
         try data.write(to: url, options: .atomic)
     }
 
-    public func coreMLCompiledURL() throws -> URL {
-        try containerURL().appendingPathComponent(AppConstants.AppGroupFiles.coreMLModel)
+    public func coreMLCompiledURL(locale: String = "zh-Hans") throws -> URL {
+        let safe = locale.replacingOccurrences(of: "/", with: "_")
+        return try containerURL().appendingPathComponent("coreml_\(safe).mlmodelc")
     }
 
-    public func saveRawCoreMLModel(_ data: Data) async throws -> URL {
-        let url = try containerURL().appendingPathComponent("spam_classifier.mlmodel")
+    public func saveRawCoreMLModel(_ data: Data, locale: String = "zh-Hans") async throws -> URL {
+        let safe = locale.replacingOccurrences(of: "/", with: "_")
+        let url = try containerURL().appendingPathComponent("coreml_\(safe).mlmodel")
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         try data.write(to: url, options: .atomic)
         return url
     }
 
-    public func hasCoreMLModel() async -> Bool {
-        guard let url = try? coreMLCompiledURL() else { return false }
+    public func hasCoreMLModel(locale: String = "zh-Hans") async -> Bool {
+        guard let url = try? coreMLCompiledURL(locale: locale) else { return false }
         return FileManager.default.fileExists(atPath: url.path)
     }
 

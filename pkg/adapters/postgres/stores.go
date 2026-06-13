@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -80,6 +81,19 @@ func (s *RuleStore) GetLatest(ctx context.Context) (*ports.RuleBundle, error) {
 		return nil, err
 	}
 	return &ports.RuleBundle{Version: version, Checksum: checksum, Payload: payload}, nil
+}
+
+func (s *RuleStore) GetByVersion(ctx context.Context, version string) (*ports.RuleBundle, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT version, checksum, payload FROM rules WHERE version=$1`, version)
+	var v, checksum string
+	var payload []byte
+	if err := row.Scan(&v, &checksum, &payload); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("version not found")
+		}
+		return nil, err
+	}
+	return &ports.RuleBundle{Version: v, Checksum: checksum, Payload: payload}, nil
 }
 
 func (s *RuleStore) Save(ctx context.Context, bundle ports.RuleBundle) error {

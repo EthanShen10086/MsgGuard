@@ -19,7 +19,9 @@ public enum SyncConfigLoader {
     }
 
     public static func coreMLModelURL(appGroupID: String = AppConstants.appGroupID) -> URL? {
-        containerURL(appGroupID)?.appendingPathComponent(AppConstants.AppGroupFiles.coreMLModel)
+        let config = loadConfig(appGroupID: appGroupID)
+        let safe = config.locale.replacingOccurrences(of: "/", with: "_")
+        return containerURL(appGroupID)?.appendingPathComponent("coreml_\(safe).mlmodelc")
     }
 
     public static func saveStatsIncrement(category: MessageCategory, appGroupID: String = AppConstants.appGroupID) {

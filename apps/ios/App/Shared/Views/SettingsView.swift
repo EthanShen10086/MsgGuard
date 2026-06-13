@@ -30,6 +30,27 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                Section(String(localized: "settings.sync")) {
+                    Toggle(String(localized: "settings.iCloudSync"), isOn: Binding(
+                        get: { appState.filterConfig.iCloudSyncEnabled },
+                        set: {
+                            guard EntitlementManager.shared.hasEntitlement(.autoSync) else { return }
+                            appState.filterConfig.iCloudSyncEnabled = $0
+                            Task { await appState.saveConfig() }
+                        }
+                    ))
+                    .disabled(!EntitlementManager.shared.hasEntitlement(.autoSync))
+                    if !EntitlementManager.shared.hasEntitlement(.autoSync) {
+                        Text(String(localized: "settings.iCloudSyncProHint"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Section(String(localized: "settings.callDirectory")) {
+                    Text(String(localized: "settings.callDirectoryHint"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 Section(String(localized: "settings.accessibility")) {
                     Picker(String(localized: "settings.userMode"), selection: Binding(
                         get: { appState.userMode },

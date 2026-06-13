@@ -1,0 +1,44 @@
+{{- if .Values.certManager.enabled }}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Chart.Name }}-letsencrypt
+spec:
+  acme:
+    server: {{ .Values.certManager.acmeServer | quote }}
+    email: {{ .Values.certManager.email | quote }}
+    privateKeySecretRef:
+      name: {{ .Chart.Name }}-acme-account
+    solvers:
+      - http01:
+          ingress:
+            class: {{ .Values.ingress.className | default "nginx" }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Chart.Name }}-tls
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ .Values.certManager.tlsSecretName | default "msgguard-tls" }}
+  issuerRef:
+    name: {{ .Chart.Name }}-letsencrypt
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ .Values.ingress.host | quote }}
+{{- if .Values.certManager.clientCA.enabled }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Chart.Name }}-mtls-ca
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ .Values.certManager.clientCA.secretName | default "msgguard-mtls-ca" }}
+  issuerRef:
+    name: {{ .Values.certManager.clientCA.issuerName | default "ca-issuer" }}
+    kind: ClusterIssuer
+  commonName: MsgGuard mTLS Client CA
+  isCA: true
+{{- end }}
+{{- end }}
