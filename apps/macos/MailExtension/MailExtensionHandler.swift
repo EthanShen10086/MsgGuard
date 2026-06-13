@@ -3,11 +3,16 @@ import Foundation
 import MailKit
 import SharedModels
 
-/// macOS Mail.app extension — classifies message subject/body with the same HybridFilterEngine as SMS.
+/// macOS Mail.app extension — classifies messages with HybridFilterEngine (subject + full body).
 final class MailExtensionHandler: NSObject, MEExtension, MEMessageActionHandler {
     func handlerForMessageActions() -> MEMessageActionHandler { self }
 
     func decideAction(for message: MEMessage, completionHandler: @escaping (MEMessageActionDecision?) -> Void) {
+        if message.rawData == nil {
+            completionHandler(MEMessageActionDecision.invokeAgainWithBody)
+            return
+        }
+
         let config = SyncConfigLoader.loadConfig()
         var engine = HybridFilterEngine()
         if let bayes = SyncConfigLoader.loadBayesModel() {
@@ -18,10 +23,12 @@ final class MailExtensionHandler: NSObject, MEExtension, MEMessageActionHandler 
             try? engine.loadCoreML(from: coreURL)
         }
 
-        let subject = message.subject ?? ""
-        let body = subject
-        let result = engine.classify(sender: nil, body: body, config: config)
+        let subject = message.subject
+        let sender = message.fromAddress.addressString
+        let bodyText = MailRFC822Parser.plainText(from: message.rawData) ?? ""
+        let combined = [subject, bodyText].filter { !$0.isEmpty }.joined(separator: "\n")
 
+        let result = engine.classify(sender: sender, body: combined, config: config)
         guard result.shouldFilter else {
             completionHandler(nil)
             return

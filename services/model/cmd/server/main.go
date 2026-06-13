@@ -60,6 +60,7 @@ func (s *server) latest(w http.ResponseWriter, r *http.Request) {
 		"checksum": meta.Checksum,
 		"url":      "/api/v1/models/" + meta.Version + "/download/spam_classifier.mlmodel",
 		"bayes_url": "/api/v1/models/" + meta.Version + "/download/bayes_model.json",
+		"featurizer_url": "/api/v1/models/" + meta.Version + "/download/coreml_featurizer.json",
 		"minIOS":   "17.0",
 	})
 }

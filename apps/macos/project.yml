@@ -12,6 +12,21 @@ packages:
     path: ../ios/Packages/FilterEngine
 
 targets:
+  MsgGuardMailHost:
+    type: application
+    platform: macOS
+    sources:
+      - path: MailHost
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ethanshen.msgguard.mailhost
+        INFOPLIST_FILE: MailHost/Info.plist
+        CODE_SIGN_ENTITLEMENTS: MailHost/MailHost.entitlements
+        CODE_SIGN_STYLE: Automatic
+    dependencies:
+      - target: MailExtension
+        embed: true
+
   MailExtension:
     type: app-extension
     platform: macOS
@@ -19,7 +34,7 @@ targets:
       - path: MailExtension
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.ethanshen.msgguard.mail
+        PRODUCT_BUNDLE_IDENTIFIER: com.ethanshen.msgguard.mailhost.filter
         INFOPLIST_FILE: MailExtension/Info.plist
         CODE_SIGN_ENTITLEMENTS: MailExtension/MailExtension.entitlements
         CODE_SIGN_STYLE: Automatic
@@ -32,8 +47,16 @@ targets:
         com.apple.security.app-sandbox: true
         com.apple.security.application-groups:
           - group.com.ethanshen.msgguard
+        com.apple.developer.mail-client: true
 
 schemes:
+  MsgGuardMailHost:
+    build:
+      targets:
+        MsgGuardMailHost: all
+        MailExtension: all
+    run:
+      config: Debug
   MailExtension:
     build:
       targets:

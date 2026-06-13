@@ -14,6 +14,7 @@ actor ModelUpdateService {
         let checksum: String
         let url: String
         let bayes_url: String?
+        let featurizer_url: String?
     }
 
     func checkAndUpdate(locale: String? = nil) async throws {
@@ -41,8 +42,16 @@ actor ModelUpdateService {
             throw MGError.network(.serverError)
         }
         let rawURL = try await store.saveRawCoreMLModel(data, locale: activeLocale)
+        var featurizerFile: URL?
+        if let featurizerPath = meta.featurizer_url {
+            featurizerFile = try await downloadFeaturizer(relativePath: featurizerPath, locale: activeLocale)
+        }
         let compiled = try await store.coreMLCompiledURL(locale: activeLocale)
-        try CoreMLModelCompiler.compileAndInstall(rawModelURL: rawURL, destinationURL: compiled)
+        try CoreMLModelCompiler.compileAndInstall(
+            rawModelURL: rawURL,
+            destinationURL: compiled,
+            featurizerURL: featurizerFile
+        )
         try? FileManager.default.removeItem(at: rawURL)
         var updated = config
         updated.modelVersion = meta.version
@@ -52,6 +61,16 @@ actor ModelUpdateService {
             try await downloadBayes(relativePath: bayesPath, locale: activeLocale)
         }
         WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    private func downloadFeaturizer(relativePath: String, locale: String) async throws -> URL? {
+        let url = resolveURL(relativePath)
+        let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
+        guard let http = response as? HTTPURLResponse, (200 ... 299).contains(http.statusCode) else {
+            return nil
+        }
+        try await store.saveCoreMLFeaturizer(data, locale: locale)
+        return try await store.coreMLFeaturizerURL(locale: locale)
     }
 
     private func downloadBayes(relativePath: String, locale: String) async throws {

@@ -8,14 +8,46 @@
 
 /* Begin PBXBuildFile section */
 		0425DA451EB75EF3D4B6639D /* MailExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A065F705007B6A129F51499 /* MailExtensionHandler.swift */; };
+		2E8D0FD2085B67665DE4D7BB /* MailExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1CE98E3A0C69982AD3CC5B86 /* MailExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		83541D233115E2F4ECDF7DBA /* FilterEngine in Frameworks */ = {isa = PBXBuildFile; productRef = ECA1BB3D444DEA6208C93033 /* FilterEngine */; };
 		DB970EE0B15D6B671C94191B /* SharedModels in Frameworks */ = {isa = PBXBuildFile; productRef = A29CD371B16E35FE9CF09BEB /* SharedModels */; };
+		DDB297066B18B900DC064400 /* MailRFC822Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C052AAF88084C278EBCED1D4 /* MailRFC822Parser.swift */; };
+		F4E38B16784AA4AE2F306E30 /* MailHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90836B7E06838082CAD1F781 /* MailHostApp.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		001C9D36EA1111296CFAF51E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 056C7864A083675BBE499BCF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D320CF5E9386E89265F5BD0F;
+			remoteInfo = MailExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D9145EAE21450F8192FF0F3F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2E8D0FD2085B67665DE4D7BB /* MailExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1CE98E3A0C69982AD3CC5B86 /* MailExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MailExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C7566C59027AFB4763E593E /* MailHost.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MailHost.entitlements; sourceTree = "<group>"; };
+		65261EB3FE93E6E808C1675C /* MsgGuardMailHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MsgGuardMailHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		90836B7E06838082CAD1F781 /* MailHostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailHostApp.swift; sourceTree = "<group>"; };
 		9A065F705007B6A129F51499 /* MailExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailExtensionHandler.swift; sourceTree = "<group>"; };
 		ACA78087486C777A784D2B4B /* SharedModels */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SharedModels; path = ../ios/Packages/SharedModels; sourceTree = SOURCE_ROOT; };
+		B9BBFF5DC2318B65934B3AFE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C052AAF88084C278EBCED1D4 /* MailRFC822Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRFC822Parser.swift; sourceTree = "<group>"; };
 		F6071B0F7F121892E85B736B /* MailExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MailExtension.entitlements; sourceTree = "<group>"; };
 		F8009DD59C0DD4D366935092 /* FilterEngine */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FilterEngine; path = ../ios/Packages/FilterEngine; sourceTree = SOURCE_ROOT; };
 		F88B281F57B6299CA6453FD0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -40,6 +72,7 @@
 				F88B281F57B6299CA6453FD0 /* Info.plist */,
 				F6071B0F7F121892E85B736B /* MailExtension.entitlements */,
 				9A065F705007B6A129F51499 /* MailExtensionHandler.swift */,
+				C052AAF88084C278EBCED1D4 /* MailRFC822Parser.swift */,
 			);
 			path = MailExtension;
 			sourceTree = "<group>";
@@ -57,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				1CE98E3A0C69982AD3CC5B86 /* MailExtension.appex */,
+				65261EB3FE93E6E808C1675C /* MsgGuardMailHost.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -65,14 +99,44 @@
 			isa = PBXGroup;
 			children = (
 				07CE3E1076D2F94A055CC0DC /* MailExtension */,
+				F37B0B34B183D58034B91FE3 /* MailHost */,
 				2F14B1D45711924F4FB8556D /* Packages */,
 				7C61F6C116829D03E060B2E3 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
+		F37B0B34B183D58034B91FE3 /* MailHost */ = {
+			isa = PBXGroup;
+			children = (
+				B9BBFF5DC2318B65934B3AFE /* Info.plist */,
+				4C7566C59027AFB4763E593E /* MailHost.entitlements */,
+				90836B7E06838082CAD1F781 /* MailHostApp.swift */,
+			);
+			path = MailHost;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		706A9BD6758B8CBE397C7BD2 /* MsgGuardMailHost */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 93B8D7C72DC50E0E67D77AB0 /* Build configuration list for PBXNativeTarget "MsgGuardMailHost" */;
+			buildPhases = (
+				F9C3F2058E50032CC30BEA50 /* Sources */,
+				D9145EAE21450F8192FF0F3F /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8036B426EF79D77C07C18260 /* PBXTargetDependency */,
+			);
+			name = MsgGuardMailHost;
+			packageProductDependencies = (
+			);
+			productName = MsgGuardMailHost;
+			productReference = 65261EB3FE93E6E808C1675C /* MsgGuardMailHost.app */;
+			productType = "com.apple.product-type.application";
+		};
 		D320CF5E9386E89265F5BD0F /* MailExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 18B10FADE4BD440947BF5AD3 /* Build configuration list for PBXNativeTarget "MailExtension" */;
@@ -102,6 +166,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					706A9BD6758B8CBE397C7BD2 = {
+						ProvisioningStyle = Automatic;
+					};
 					D320CF5E9386E89265F5BD0F = {
 						ProvisioningStyle = Automatic;
 					};
@@ -126,6 +193,7 @@
 			projectRoot = "";
 			targets = (
 				D320CF5E9386E89265F5BD0F /* MailExtension */,
+				706A9BD6758B8CBE397C7BD2 /* MsgGuardMailHost */,
 			);
 		};
 /* End PBXProject section */
@@ -136,12 +204,63 @@
 			buildActionMask = 2147483647;
 			files = (
 				0425DA451EB75EF3D4B6639D /* MailExtensionHandler.swift in Sources */,
+				DDB297066B18B900DC064400 /* MailRFC822Parser.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F9C3F2058E50032CC30BEA50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4E38B16784AA4AE2F306E30 /* MailHostApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		8036B426EF79D77C07C18260 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D320CF5E9386E89265F5BD0F /* MailExtension */;
+			targetProxy = 001C9D36EA1111296CFAF51E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		79DBFC04F77830A05DFFF29B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MailHost/MailHost.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = MailHost/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mailhost;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		85EF65C3375DD48EAC9CF52C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MailHost/MailHost.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = MailHost/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mailhost;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
 		86EB2CFEB2A11A7EC5F131AE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -217,7 +336,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mailhost.filter;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -290,7 +409,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mailhost.filter;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -312,6 +431,15 @@
 			buildConfigurations = (
 				86EB2CFEB2A11A7EC5F131AE /* Debug */,
 				B0B8BF0EEC37C1AED8A139DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		93B8D7C72DC50E0E67D77AB0 /* Build configuration list for PBXNativeTarget "MsgGuardMailHost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85EF65C3375DD48EAC9CF52C /* Debug */,
+				79DBFC04F77830A05DFFF29B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

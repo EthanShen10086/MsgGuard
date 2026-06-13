@@ -84,3 +84,9 @@
 - [x] `make train-all-locales` / `export-all-locales` + per-locale benchmark gates
 - [x] iOS Bayes/CoreML per-locale OTA paths + model service `bayes_url`
 - [x] macOS MailKit extension (`apps/macos/MailExtension`)
+
+## Phase 2.8 — CoreML CI + Mail distribution
+- [x] coremltools export with featurizer JSON + CI artifact gate (`verify_coreml_export.py`)
+- [x] iOS CoreMLFeaturizer + OTA featurizer_url
+- [x] macOS Mail host app + mail-client entitlement + Fastlane TestFlight/notarize lanes
+- [x] Mail extension invokeAgainWithBody + RFC822 body parsing

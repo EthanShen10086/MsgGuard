@@ -11,10 +11,23 @@ iOS does **not** expose a system Mail filter API. This target is **macOS only** 
 ```bash
 cd apps/macos
 xcodegen generate
-xcodebuild -scheme MailExtension -destination 'platform=macOS' build
+xcodebuild -scheme MsgGuardMailHost -destination 'platform=macOS' build
 ```
 
 Enable in **Mail → Settings → Extensions → MsgGuard Mail**.
+
+## Classification flow
+
+1. First pass: if `rawData` is unavailable → `MEMessageActionDecision.invokeAgainWithBody`
+2. Second pass: parse RFC822 plain text + subject, run `HybridFilterEngine`
+3. Spam → `MEMessageAction.moveToTrash`
+
+## Distribution
+
+- **TestFlight / Mac App Store**: `bundle exec fastlane mac mail_testflight`
+- **Developer ID + notarization**: `bundle exec fastlane mac mail_notarize`
+
+See [MACOS_MAIL_ASC.md](../app-store/MACOS_MAIL_ASC.md).
 
 ## Behavior
 

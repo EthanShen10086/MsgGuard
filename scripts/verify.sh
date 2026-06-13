@@ -28,11 +28,16 @@ for pkg in app adapters httpauth; do
 done
 
 echo "=== ML benchmark ==="
-BENCH_LOG="$(cd ml && make benchmark 2>&1)" || true
+BENCH_LOG="$(cd ml && CI=true make benchmark 2>&1)" || true
 if echo "$BENCH_LOG" | rg -q 'gate_passed=(True|true)|"gate_passed": true'; then
   ok "ml benchmark gate"
 else
   fail "ml benchmark gate"
+fi
+if test -f ml/output/zh-Hans/spam_classifier.mlmodel && test -f ml/output/en-US/coreml_featurizer.json; then
+  ok "coreml per-locale artifacts"
+else
+  fail "coreml per-locale artifacts"
 fi
 
 echo "=== Product metrics ==="
@@ -153,10 +158,10 @@ if test -x deploy/mtls/gen-certs.sh && test -f pkg/httpauth/clientcert.go; then
 else
   fail "mtls assets"
 fi
-if test -f docs/product/MAIL_EXTENSION.md && test -f apps/macos/project.yml; then
-  ok "macOS mail extension scaffold"
+if test -f docs/app-store/MACOS_MAIL_ASC.md; then
+  ok "macOS mail ASC checklist"
 else
-  fail "macOS mail extension scaffold"
+  fail "macOS mail ASC checklist"
 fi
 if test -f ml/locale_utils.py; then
   ok "per-locale ML utils"

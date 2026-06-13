@@ -48,6 +48,7 @@ export-all-locales:
 	@for loc in $$(echo "$(LOCALES)" | tr ',' ' '); do \
 		$(MAKE) export-locale LOCALE=$$loc; \
 	done
+	CI=true python3 scripts/verify_coreml_export.py
 
 benchmark: train-all-locales export-all-locales
 	python3 benchmark/run_benchmark.py

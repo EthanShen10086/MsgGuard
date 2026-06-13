@@ -1,13 +1,55 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Build and upload to TestFlight"
+  desc "Build and upload iOS app to TestFlight"
   lane :beta do
+    sh("cd ../apps/ios && xcodegen generate")
     build_app(
       project: "apps/ios/MsgGuard.xcodeproj",
       scheme: "MsgGuard-iOS",
       export_method: "app-store"
     )
     upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+end
+
+platform :mac do
+  desc "Build macOS Mail host + extension for TestFlight / Mac App Store"
+  lane :mail_testflight do
+    sh("cd ../apps/macos && xcodegen generate")
+    build_app(
+      project: "apps/macos/MsgGuard-macOS.xcodeproj",
+      scheme: "MsgGuardMailHost",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.ethanshen.msgguard.mailhost" => ENV.fetch("MACOS_HOST_PROFILE", "MsgGuard Mail Host"),
+          "com.ethanshen.msgguard.mailhost.filter" => ENV.fetch("MACOS_MAIL_EXT_PROFILE", "MsgGuard Mail Extension")
+        }
+      }
+    )
+    upload_to_testflight(app_platform: "osx", skip_waiting_for_build_processing: true)
+  end
+
+  desc "Build and notarize macOS Mail host for direct distribution (Developer ID)"
+  lane :mail_notarize do
+    sh("cd ../apps/macos && xcodegen generate")
+    build_app(
+      project: "apps/macos/MsgGuard-macOS.xcodeproj",
+      scheme: "MsgGuardMailHost",
+      export_method: "developer-id",
+      export_options: {
+        provisioningProfiles: {
+          "com.ethanshen.msgguard.mailhost" => ENV.fetch("MACOS_HOST_PROFILE", "MsgGuard Mail Host Developer ID"),
+          "com.ethanshen.msgguard.mailhost.filter" => ENV.fetch("MACOS_MAIL_EXT_PROFILE", "MsgGuard Mail Extension Developer ID")
+        }
+      }
+    )
+    notarize(
+      use_notarytool: true,
+      apple_id: ENV["FASTLANE_APPLE_ID"],
+      asc_provider: ENV.fetch("ASC_PROVIDER", "EthanShen"),
+      team_id: ENV.fetch("FASTLANE_TEAM_ID", "")
+    )
   end
 end

@@ -76,6 +76,17 @@ public actor BlocklistStore {
         return url
     }
 
+    public func coreMLFeaturizerURL(locale: String = "zh-Hans") throws -> URL {
+        let safe = locale.replacingOccurrences(of: "/", with: "_")
+        return try containerURL().appendingPathComponent("coreml_\(safe)_featurizer.json")
+    }
+
+    public func saveCoreMLFeaturizer(_ data: Data, locale: String = "zh-Hans") async throws {
+        let url = try coreMLFeaturizerURL(locale: locale)
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try data.write(to: url, options: .atomic)
+    }
+
     public func hasCoreMLModel(locale: String = "zh-Hans") async -> Bool {
         guard let url = try? coreMLCompiledURL(locale: locale) else { return false }
         return FileManager.default.fileExists(atPath: url.path)

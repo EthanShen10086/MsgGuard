@@ -28,7 +28,7 @@ def artifact_meta(path: Path):
 def publish_locale(locale: str) -> None:
     tag = normalize_locale(locale)
     out = output_dir(ROOT, tag)
-    names = ["bayes_pipeline.joblib", "coreml_pipeline.joblib", "spam_classifier.mlmodel", "bayes_model.json"]
+    names = ["bayes_pipeline.joblib", "coreml_pipeline.joblib", "spam_classifier.mlmodel", "bayes_model.json", "coreml_featurizer.json"]
     artifacts = []
     version = "1.0.0"
     core_checksum = "seed"

@@ -16,6 +16,14 @@ jobs:
             cd apps/ios/Packages/$pkg && swift test
           done
 
+  macos-mail:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cd apps/macos && xcodegen generate
+          xcodebuild -scheme MsgGuardMailHost -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
+
   go-gateway:
     runs-on: ubuntu-latest
     steps:
@@ -32,6 +40,7 @@ jobs:
           cd ../../services/gateway && go mod tidy && go build ./cmd/server
           cd ../model && go build ./cmd/server
           cd ../admin && go build ./cmd/server
+          cd ../flywheel && go build ./cmd/worker
 
   helm-template:
     runs-on: ubuntu-latest
@@ -44,14 +53,22 @@ jobs:
 
   ml-benchmark:
     runs-on: ubuntu-latest
+    env:
+      CI: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
           make data
-          make train
+          make train-all-locales
+          make export-all-locales
           make benchmark
         working-directory: ml
+      - run: |
+          test -f ml/output/zh-Hans/spam_classifier.mlmodel
+          test -f ml/output/en-US/spam_classifier.mlmodel
+          test $(stat -c%s ml/output/zh-Hans/spam_classifier.mlmodel) -gt 512
