@@ -26,9 +26,21 @@ jobs:
       - run: |
           git clone --depth 1 https://github.com/EthanShen10086/voxera-kit.git ../voxera-kit || true
       - run: |
-          cd pkg/adapters && go mod tidy
+          cd pkg/adapters && go mod tidy && go build ./...
+          cd ../httpauth && go build ./...
+          cd ../app && go build ./...
           cd ../../services/gateway && go mod tidy && go build ./cmd/server
           cd ../model && go build ./cmd/server
+          cd ../admin && go build ./cmd/server
+
+  helm-template:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - run: |
+          helm template msgguard deploy/helm/msgguard | rg -q Deployment
+          helm template msgguard deploy/helm/msgguard -f deploy/helm/msgguard/values-mongodb.yaml | rg -q mongodb
 
   ml-benchmark:
     runs-on: ubuntu-latest

@@ -102,11 +102,34 @@ else
 fi
 
 echo "=== iOS build ==="
-if (cd apps/ios && xcodegen generate >/dev/null && \
-    xcodebuild -scheme MsgGuard-iOS -destination 'platform=iOS Simulator,name=iPhone 16' build 2>&1 | rg -q 'BUILD SUCCEEDED'); then
+if (cd apps/ios && xcodegen generate >/dev/null && sleep 2 && \
+    xcodebuild -scheme MsgGuard-iOS -destination 'platform=iOS Simulator,name=iPhone 16' clean build 2>&1 | rg -q 'BUILD SUCCEEDED'); then
   ok "iOS BUILD SUCCEEDED"
 else
   fail "iOS build"
+fi
+
+echo "=== Helm + legal ==="
+if test -f docs/legal/PRIVACY.md && test -f deploy/site/privacy/index.html; then
+  ok "privacy policy files"
+else
+  fail "privacy policy files"
+fi
+if command -v helm >/dev/null 2>&1; then
+  if helm template msgguard deploy/helm/msgguard -f deploy/helm/msgguard/values-mongodb.yaml 2>/dev/null | rg -q 'mongodb'; then
+    ok "helm mongodb values"
+  else
+    fail "helm mongodb values"
+  fi
+elif rg -q 'driver: mongodb' deploy/helm/msgguard/values-mongodb.yaml; then
+  ok "helm mongodb values (values file)"
+else
+  fail "helm mongodb values"
+fi
+if test -f docs/app-store/metadata.md && test -f docs/app-store/review-notes.md; then
+  ok "app store metadata draft"
+else
+  fail "app store metadata draft"
 fi
 
 echo ""

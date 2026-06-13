@@ -17,7 +17,10 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 70
 database:
+  driver: postgres
   dsn: ""
+auth:
+  secret: ""
 redis:
   url: ""
 config:

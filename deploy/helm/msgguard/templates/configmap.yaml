@@ -4,5 +4,7 @@ metadata:
   name: {{ .Chart.Name }}-config
 data:
   CONFIG_PATH: /app/deploy/config.yaml
+  DATABASE_DRIVER: {{ .Values.database.driver | default "postgres" | quote }}
   DATABASE_DSN: {{ .Values.database.dsn | quote }}
+  AUTH_SECRET: {{ .Values.auth.secret | quote }}
   REDIS_URL: {{ .Values.redis.url | quote }}

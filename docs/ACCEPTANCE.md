@@ -47,3 +47,10 @@
 - [x] `Products.storekit` 本地 StoreKit 测试配置
 - [x] Cloud LLM 需 Pro  entitlement（Settings 禁用提示）
 - [x] Cookbook 31
+
+## Phase 2.3 — App Store / Privacy / Helm MongoDB
+- [x] `docs/app-store/metadata.md` + `review-notes.md`
+- [x] `docs/legal/PRIVACY.md` + static `deploy/site/privacy/index.html`
+- [x] Helm `values-mongodb.yaml` + `DATABASE_DRIVER` in ConfigMap
+- [x] `make tier3-mongodb` / `deploy/tiers/tier3-helm-mongodb.sh`
+- [x] Cookbook 32

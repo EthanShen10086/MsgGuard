@@ -4,5 +4,12 @@ ingress:
 autoscaling:
   minReplicas: 1
   maxReplicas: 3
+database:
+  driver: postgres
+  dsn: ""
+auth:
+  secret: ""
+redis:
+  url: ""
 config:
   cloudLLM: false

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MsgGuard Privacy Policy</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.15rem; margin-top: 2rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    th { background: #f5f5f5; }
+    .muted { color: #666; font-size: 0.9rem; }
+    a { color: #0066cc; }
+  </style>
+</head>
+<body>
+  <h1>MsgGuard Privacy Policy</h1>
+  <p class="muted">Effective: 2026-06-13 · <a href="mailto:privacy@msgguard.app">privacy@msgguard.app</a></p>
+
+  <p><strong>Summary:</strong> MsgGuard filters spam SMS <em>on your device</em> by default. We do not upload message bodies unless you subscribe to Pro and enable Cloud AI.</p>
+
+  <h2>What we collect</h2>
+  <table>
+    <tr><th>Data</th><th>Default</th><th>Purpose</th></tr>
+    <tr><td>SMS body</td><td>Not collected</td><td>Only if Pro + Cloud AI on</td></tr>
+    <tr><td>Filter labels / feedback</td><td>On-device / hash</td><td>Improve accuracy</td></tr>
+    <tr><td>Analytics (event names)</td><td>Yes</td><td>Product metrics</td></tr>
+    <tr><td>Purchases</td><td>Via Apple</td><td>Pro entitlement</td></tr>
+  </table>
+
+  <h2>On-device processing</h2>
+  <p>Rules, Bayes, and Core ML models run locally. No SMS content leaves your phone in the default configuration.</p>
+
+  <h2>Cloud AI (opt-in)</h2>
+  <p>Pro users may enable Cloud AI in Settings. Single messages are sent over HTTPS to <code>api.msgguard.app</code> for classification only. Disable anytime.</p>
+
+  <h2>Retention</h2>
+  <p>Server feedback ~90 days; analytics aggregated 30–90 days; crash reports 30 days if opted in.</p>
+
+  <h2>Your rights</h2>
+  <p>Contact <a href="mailto:privacy@msgguard.app">privacy@msgguard.app</a> for access or deletion requests.</p>
+
+  <h2>中文</h2>
+  <p>MsgGuard 默认在 iPhone 本地识别垃圾短信，不上传短信原文。仅 Pro 用户主动开启「云端 AI」时才会发送单条短信至服务器分类。详见仓库 <code>docs/legal/PRIVACY.md</code>。</p>
+
+  <p class="muted"><a href="https://msgguard.app">msgguard.app</a></p>
+</body>
+</html>

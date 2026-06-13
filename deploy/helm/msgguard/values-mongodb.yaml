@@ -1,0 +1,15 @@
+replicaCount: 1
+ingress:
+  host: staging-api.msgguard.app
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 3
+database:
+  driver: mongodb
+  dsn: "mongodb://msgguard:CHANGE_ME@mongodb.msgguard-staging.svc.cluster.local:27017/?authSource=admin"
+auth:
+  secret: "CHANGE_ME_STAGING"
+redis:
+  url: "redis://redis.msgguard-staging.svc.cluster.local:6379"
+config:
+  cloudLLM: false

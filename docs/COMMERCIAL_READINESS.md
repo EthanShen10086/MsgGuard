@@ -3,8 +3,8 @@
 ## Startup (Tier 0–1)
 - [x] Seed dataset + benchmark gate in CI
 - [x] docker-compose single VPS
-- [ ] App Store metadata draft
-- [ ] Privacy policy (no raw SMS upload default)
+- [x] App Store metadata draft (`docs/app-store/metadata.md`)
+- [x] Privacy policy (`docs/legal/PRIVACY.md` + `deploy/site/privacy/`)
 
 ## Growth (Tier 2–3)
 - [x] PostgreSQL + Redis wired (via Container config)
