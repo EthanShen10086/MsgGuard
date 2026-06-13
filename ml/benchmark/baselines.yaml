@@ -1,4 +1,5 @@
 f1_min: 0.85
 fpr_max: 0.02
 fnr_max: 0.15
+adversarial_fpr_max: 0.05
 latency_p99_ms: 15

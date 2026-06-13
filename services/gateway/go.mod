@@ -7,9 +7,11 @@ require (
 	github.com/EthanShen10086/msgguard/pkg/config v0.0.0
 	github.com/EthanShen10086/msgguard/pkg/httpauth v0.0.0
 	github.com/EthanShen10086/msgguard/pkg/ports v0.0.0
+	github.com/EthanShen10086/voxera-kit/aiquota v0.0.0
 	github.com/EthanShen10086/voxera-kit/audit v0.0.0
 	github.com/EthanShen10086/voxera-kit/auth v0.0.0
 	github.com/EthanShen10086/voxera-kit/circuitbreaker v0.0.0
+	github.com/EthanShen10086/voxera-kit/featureflag v0.0.0
 	github.com/EthanShen10086/voxera-kit/loadshed v0.0.0
 	github.com/EthanShen10086/voxera-kit/middleware v0.0.0
 	github.com/EthanShen10086/voxera-kit/observability v0.0.0
@@ -23,9 +25,11 @@ replace (
 	github.com/EthanShen10086/msgguard/pkg/config => ../../pkg/config
 	github.com/EthanShen10086/msgguard/pkg/httpauth => ../../pkg/httpauth
 	github.com/EthanShen10086/msgguard/pkg/ports => ../../pkg/ports
+	github.com/EthanShen10086/voxera-kit/aiquota => ../../../voxera-kit/backend/aiquota
 	github.com/EthanShen10086/voxera-kit/audit => ../../../voxera-kit/backend/audit
 	github.com/EthanShen10086/voxera-kit/auth => ../../../voxera-kit/backend/auth
 	github.com/EthanShen10086/voxera-kit/circuitbreaker => ../../../voxera-kit/backend/circuitbreaker
+	github.com/EthanShen10086/voxera-kit/featureflag => ../../../voxera-kit/backend/featureflag
 	github.com/EthanShen10086/voxera-kit/loadshed => ../../../voxera-kit/backend/loadshed
 	github.com/EthanShen10086/voxera-kit/middleware => ../../../voxera-kit/backend/middleware
 	github.com/EthanShen10086/voxera-kit/observability => ../../../voxera-kit/backend/observability

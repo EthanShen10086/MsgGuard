@@ -13,10 +13,17 @@ public struct HybridFilterEngine: Sendable {
         try? bayes.importModel(from: data)
     }
 
+    public mutating func loadCoreML(from url: URL) {
+        try? coreML.load(from: url)
+    }
+
     public mutating func classify(sender: String?, body: String, config: FilterConfig) -> FilterResult {
         let start = CFAbsoluteTimeGetCurrent()
         defer { recordLatency(start) }
 
+        if config.otpProtectionEnabled, OTPGuard.isProtectedMessage(body: body, sender: sender) {
+            return FilterResult(category: .ham, confidence: 0.98, layer: .heuristic, shouldFilter: false)
+        }
         if let result = heuristic.classify(sender: sender, body: body, config: config),
            result.confidence >= 0.85 {
             return result

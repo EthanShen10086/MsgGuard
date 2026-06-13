@@ -5,6 +5,10 @@ import SwiftUI
 struct StatsView: View {
     @Environment(AppState.self) private var appState
 
+    private var showAdvancedStats: Bool {
+        EntitlementManager.shared.hasEntitlement(.advancedStats)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -18,7 +22,7 @@ struct StatsView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    if !appState.stats.byCategory.isEmpty {
+                    if showAdvancedStats, !appState.stats.byCategory.isEmpty {
                         Chart {
                             ForEach(appState.stats.byCategory.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                                 BarMark(x: .value("Category", key), y: .value("Count", value))
@@ -26,6 +30,11 @@ struct StatsView: View {
                         }
                         .frame(height: 200)
                         .padding()
+                    } else if !showAdvancedStats {
+                        Text(String(localized: "stats.proRequired"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding()
                     }
                 }
                 .padding()

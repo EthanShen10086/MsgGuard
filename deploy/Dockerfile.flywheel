@@ -1,0 +1,14 @@
+FROM golang:1.25-alpine AS builder
+WORKDIR /src
+COPY services/flywheel ./services/flywheel
+WORKDIR /src/services/flywheel
+RUN go build -o /flywheel-worker ./cmd/worker
+
+FROM python:3.11-slim
+WORKDIR /app/ml
+RUN apt-get update && apt-get install -y --no-install-recommends make bash && rm -rf /var/lib/apt/lists/*
+COPY ml/requirements.txt /app/ml/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+COPY --from=builder /flywheel-worker /usr/local/bin/flywheel-worker
+ENV ML_ROOT=/app/ml
+CMD ["flywheel-worker"]

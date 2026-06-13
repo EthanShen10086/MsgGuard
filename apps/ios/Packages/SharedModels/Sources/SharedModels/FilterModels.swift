@@ -58,6 +58,7 @@ public struct FilterConfig: Codable, Sendable, Equatable {
     public var enabledTags: Set<FilterTag>
     public var rules: [BlockRule]
     public var cloudLLMEnabled: Bool
+    public var otpProtectionEnabled: Bool
     public var locale: String
     public var modelVersion: String
 
@@ -65,12 +66,14 @@ public struct FilterConfig: Codable, Sendable, Equatable {
         enabledTags: Set<FilterTag> = Set(FilterTag.allCases),
         rules: [BlockRule] = [],
         cloudLLMEnabled: Bool = false,
+        otpProtectionEnabled: Bool = true,
         locale: String = "zh-Hans",
         modelVersion: String = "1.0.0"
     ) {
         self.enabledTags = enabledTags
         self.rules = rules
         self.cloudLLMEnabled = cloudLLMEnabled
+        self.otpProtectionEnabled = otpProtectionEnabled
         self.locale = locale
         self.modelVersion = modelVersion
     }

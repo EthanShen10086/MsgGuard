@@ -34,3 +34,12 @@ Only change `deploy/config.*.yaml` and run matching `deploy/tiers/*.sh` — no b
 - `pkg/httpauth` — shared RBAC middleware (gateway + model service)
 - iOS `EntitlementProviding` — ScrollCap-aligned subscription entitlements
 - `scripts/verify.sh` — one-shot acceptance runner
+
+## Phase 2.5 — Product + Commercial Wiring
+- [x] iOS L2 CoreML load + OTA (`CoreMLClassifier`, `ModelUpdateService`, App Group install)
+- [x] OTP protection (`OTPGuard`) + adversarial FPR benchmark gate
+- [x] Pro entitlements gating (custom rules, advanced stats, cloud LLM)
+- [x] Gateway `QuotaStore` + `FeatureFlag` on classify; admin quota/flags API (gateway + admin service)
+- [x] NATS flywheel worker (`services/flywheel`) + feedback trigger publish
+- [x] Tier matrix (`docs/deploy/TIER_MATRIX.md`), `values-prod.yaml`, caddy-site in compose
+- [x] App Store ship assets (`ASC_CHECKLIST.md`, `SCREENSHOTS.md`, `fastlane/Fastfile`)

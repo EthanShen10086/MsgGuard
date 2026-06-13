@@ -1,3 +1,9 @@
+:8088 {
+    encode gzip
+    root * /var/www/msgguard
+    file_server
+}
+
 msgguard.app, www.msgguard.app {
 	encode gzip
 	root * /var/www/msgguard

@@ -29,6 +29,10 @@ final class AppState {
             if let modelData = try await store.loadBayesModel() {
                 engine.loadBayesModel(from: modelData)
             }
+            if let url = try? await store.coreMLCompiledURL(),
+               FileManager.default.fileExists(atPath: url.path) {
+                engine.loadCoreML(from: url)
+            }
         } catch {
             ErrorPresenter.shared.present(MGError.store(.containerUnavailable))
         }

@@ -7,6 +7,12 @@ struct RulesView: View {
     @State private var newPattern = ""
     @State private var newRuleType: RuleType = .keywordBlock
 
+    private var canEditCustomRules: Bool {
+        EntitlementManager.shared.hasEntitlement(.customRules)
+    }
+
+    private let freeRuleLimit = 3
+
     var body: some View {
         NavigationStack {
             Form {
@@ -25,18 +31,27 @@ struct RulesView: View {
                     }
                 }
                 Section(String(localized: "rules.customRules")) {
+                    if !canEditCustomRules {
+                        Text(String(localized: "rules.proRequired"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Picker(String(localized: "rules.type"), selection: $newRuleType) {
                         Text("keywordBlock").tag(RuleType.keywordBlock)
                         Text("keywordAllow").tag(RuleType.keywordAllow)
                         Text("numberBlock").tag(RuleType.numberBlock)
                         Text("numberAllow").tag(RuleType.numberAllow)
                     }
+                    .disabled(!canEditCustomRules)
                     TextField(String(localized: "rules.pattern"), text: $newPattern)
+                        .disabled(!canEditCustomRules)
                     Button(String(localized: "rules.add")) {
+                        guard canEditCustomRules || appState.filterConfig.rules.count < freeRuleLimit else { return }
                         let rule = BlockRule(type: newRuleType, pattern: newPattern, priority: appState.filterConfig.rules.count)
                         appState.filterConfig.rules.append(rule)
                         newPattern = ""
                     }
+                    .disabled(!canEditCustomRules && appState.filterConfig.rules.count >= freeRuleLimit)
                     ForEach(appState.filterConfig.rules) { rule in
                         HStack {
                             Text("\(rule.type.rawValue): \(rule.pattern)")

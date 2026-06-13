@@ -1,8 +1,21 @@
 replicaCount: 3
 ingress:
   host: api.msgguard.app
+  mtls:
+    enabled: false
+    secretName: msgguard-mtls-ca
 autoscaling:
   minReplicas: 3
   maxReplicas: 20
+database:
+  driver: postgres
+  dsn: "postgres://msgguard:CHANGE_ME@postgres:5432/msgguard?sslmode=require"
+auth:
+  secret: "CHANGE_ME_PROD_AUTH"
+redis:
+  url: "redis://redis:6379"
+security:
+  mtlsAdminRequired: false
+  mtlsClientHeader: "X-Client-Cert-Subject"
 config:
   cloudLLM: true

@@ -53,13 +53,21 @@ def main():
         all_true.extend(y_true)
         all_pred.extend(y_pred)
     overall = compute_metrics(all_true, all_pred)
+    adv = results.get("adversarial.jsonl", {})
+    adv_fpr = adv.get("fpr", 1.0)
+    adv_gate = adv_fpr <= baselines.get("adversarial_fpr_max", baselines["fpr_max"])
     report = {
         "overall": {
             "f1": round(overall.f1, 4), "fpr": round(overall.fpr, 4),
             "fnr": round(overall.fnr, 4), "total": overall.total,
         },
         "by_set": results,
-        "gate_passed": overall.f1 >= baselines["f1_min"] and overall.fpr <= baselines["fpr_max"],
+        "adversarial_fpr": adv_fpr,
+        "gate_passed": (
+            overall.f1 >= baselines["f1_min"]
+            and overall.fpr <= baselines["fpr_max"]
+            and adv_gate
+        ),
         "baselines": baselines,
     }
     (REPORTS / "report.json").write_text(json.dumps(report, indent=2))

@@ -63,6 +63,22 @@ services:
     environment:
       MODEL_STORAGE_PATH: /app/deploy/models
       AUTH_SECRET: msgguard-dev-secret
+  caddy-site:
+    image: caddy:2-alpine
+    ports: ["8088:8088"]
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/var/www/msgguard:ro
+  flywheel:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.flywheel
+    environment:
+      NATS_URL: nats://nats:4222
+      ML_ROOT: /app/ml
+    volumes:
+      - ../ml:/app/ml
+    depends_on: [nats, gateway]
 
 volumes:
   pgdata:

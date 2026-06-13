@@ -12,6 +12,9 @@ tier3-mongodb:
 tier4-mtls:
 	bash deploy/tiers/tier4-mtls-compose.sh
 
+tier4-helm-mtls:
+	bash deploy/tiers/tier4-helm-prod-mtls.sh
+
 ios-test:
 	cd apps/ios/Packages/FilterEngine && swift test
 

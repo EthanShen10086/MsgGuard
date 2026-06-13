@@ -25,6 +25,17 @@ final class FilterEngineTests: XCTestCase {
         XCTAssertTrue(result?.category == .spam || result?.category == .promotion)
     }
 
+    func testOTPGuardAllowsVerificationCode() {
+        XCTAssertTrue(OTPGuard.isProtectedMessage(body: "您的验证码是847291，5分钟内有效", sender: "10690000"))
+    }
+
+    func testHybridRespectsOTPProtection() {
+        var engine = HybridFilterEngine()
+        let config = FilterConfig(otpProtectionEnabled: true, locale: "zh-Hans")
+        let result = engine.classify(sender: "106", body: "您的验证码是123456", config: config)
+        XCTAssertFalse(result.shouldFilter)
+    }
+
     func testHybridEngineEndToEnd() {
         var engine = HybridFilterEngine()
         let config = FilterConfig(locale: "zh-Hans")

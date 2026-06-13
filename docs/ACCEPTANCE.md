@@ -61,3 +61,12 @@
 - [x] Gateway `MTLS_ADMIN_REQUIRED` middleware (`pkg/httpauth/clientcert.go`)
 - [x] Helm `values-mtls.yaml` + ingress client-auth annotations
 - [x] `make tier4-mtls` / Cookbook 33
+
+## Phase 2.5 — Gap Closure (Product + Commercial Wiring)
+- [x] CoreMLClassifier loads App Group `.mlmodelc`; ModelUpdateService OTA + SHA256
+- [x] OTPGuard + adversarial FPR benchmark gate
+- [x] Pro entitlements: customRules / advancedStats / cloudLLM gating
+- [x] Gateway QuotaStore + FeatureFlag wired; admin quota/flags API
+- [x] NATS flywheel worker + feedback trigger
+- [x] Tier matrix doc + values-prod + caddy-site in compose
+- [x] ASC checklist + Fastfile + screenshots guide

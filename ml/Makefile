@@ -25,7 +25,7 @@ train:
 export:
 	python3 export/export_coreml.py
 
-benchmark: train
+benchmark: train export
 	python3 benchmark/run_benchmark.py
 	python3 benchmark/compare_layers.py
 

@@ -33,12 +33,16 @@ func Run(c *mgapp.Container) error {
 
 	classifyHandler := handler.NewClassifyHandler(
 		c.LLMClassifier, c.CircuitBreaker, c.Cache, c.Config, c.Log, c.Queue,
+		c.QuotaStore, c.FlagStore,
 	)
-	feedbackHandler := handler.NewFeedbackHandler(c.Log, c.FeedbackStore, c.AuditWriter)
+	feedbackHandler := handler.NewFeedbackHandler(c.Log, c.FeedbackStore, c.AuditWriter, c.Queue)
 	analyticsHandler := handler.NewAnalyticsHandler(c.Log, c.AnalyticsStore)
 	shadowHandler := handler.NewShadowHandler(c.Log, classifyHandler)
 	rulesHandler := handler.NewRulesHandler(c.RuleStore)
-	adminHandler := handler.NewAdminHandler(c.Log, c.AnalyticsStore, c.FeedbackStore, c.Authenticator, c.Authorizer)
+	adminHandler := handler.NewAdminHandler(
+		c.Log, c.AnalyticsStore, c.FeedbackStore, c.Authenticator, c.Authorizer,
+		c.QuotaStore, c.FlagStore,
+	)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
@@ -70,6 +74,8 @@ func Run(c *mgapp.Container) error {
 	mux.HandleFunc("/api/v1/analytics", analyticsHandler.Ingest)
 	mux.HandleFunc("/api/v1/rules/latest", rulesHandler.Latest)
 	mux.HandleFunc("/api/v1/admin/metrics/summary", adminHandler.MetricsSummary)
+	mux.HandleFunc("/api/v1/admin/quota/whitelist", adminHandler.QuotaWhitelist)
+	mux.HandleFunc("/api/v1/admin/flags", adminHandler.FeatureFlags)
 	mux.HandleFunc("/api/v1/models/register", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			claims, err := authenticate(c, r)

@@ -26,6 +26,8 @@
 "rules.pattern" = "匹配模式";
 "rules.add" = "添加规则";
 "rules.save" = "保存";
+"rules.proRequired" = "Pro 可解锁无限自定义规则（免费版最多 3 条）。";
+"stats.proRequired" = "升级 Pro 查看分类统计图表。";
 "settings.extension" = "扩展";
 "settings.extensionEnabled" = "过滤器已启用";
 "settings.privacy" = "隐私";

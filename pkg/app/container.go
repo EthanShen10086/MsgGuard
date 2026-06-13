@@ -5,12 +5,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/EthanShen10086/voxera-kit/aiquota"
 	aiquotaMemory "github.com/EthanShen10086/voxera-kit/aiquota/memory"
 	"github.com/EthanShen10086/voxera-kit/audit"
 	auditMemory "github.com/EthanShen10086/voxera-kit/audit/memory"
 	"github.com/EthanShen10086/voxera-kit/auth"
 	"github.com/EthanShen10086/voxera-kit/circuitbreaker"
 	cbAdapter "github.com/EthanShen10086/voxera-kit/circuitbreaker/memory"
+	"github.com/EthanShen10086/voxera-kit/featureflag"
 	ffMemory "github.com/EthanShen10086/voxera-kit/featureflag/memory"
 	"github.com/EthanShen10086/voxera-kit/llm"
 	"github.com/EthanShen10086/voxera-kit/llm/deepseek"
@@ -48,8 +50,8 @@ type Container struct {
 	RateLimiter     ratelimiter.RateLimiter
 	CircuitBreaker  circuitbreaker.CircuitBreaker
 	AuditWriter     audit.Writer
-	QuotaStore      interface{}
-	FlagStore       interface{}
+	QuotaStore      aiquota.Manager
+	FlagStore       featureflag.Store
 	LLMRouter       *llm.Router
 }
 
@@ -109,6 +111,8 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 	c.AuditWriter = auditMemory.NewAdapter()
 	c.QuotaStore = aiquotaMemory.NewStore()
 	c.FlagStore = ffMemory.NewAdapter()
+	_ = c.FlagStore.SetFlag(ctx, featureflag.Flag{Key: "cloud_llm", Enabled: cfg.Features.CloudLLM, Percentage: 100})
+	_ = c.FlagStore.SetFlag(ctx, featureflag.Flag{Key: "shadow_mode", Enabled: false, Percentage: 0})
 
 	return c, nil
 }

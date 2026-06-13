@@ -38,6 +38,10 @@ extension MessageFilterExtension: ILMessageFilterQueryHandling {
         if let modelData = SyncConfigLoader.loadBayesModel() {
             engine.loadBayesModel(from: modelData)
         }
+        if let coreURL = SyncConfigLoader.coreMLModelURL(),
+           FileManager.default.fileExists(atPath: coreURL.path) {
+            engine.loadCoreML(from: coreURL)
+        }
 
         let body = queryRequest.messageBody ?? ""
         let result = engine.classify(sender: queryRequest.sender, body: body, config: config)

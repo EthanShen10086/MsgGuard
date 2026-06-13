@@ -36,7 +36,7 @@ public actor APIClient {
     private let session: URLSession
     public private(set) var lastTraceID = UUID().uuidString
 
-    public init(baseURL: URL = URL(string: "http://localhost:8080")!) {
+    public init(baseURL: URL = URL(string: ProcessInfo.processInfo.environment["MSGGUARD_API_BASE"] ?? "http://localhost:8080")!) {
         self.baseURL = baseURL
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 15

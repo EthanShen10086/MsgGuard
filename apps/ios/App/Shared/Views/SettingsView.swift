@@ -18,13 +18,13 @@ struct SettingsView: View {
                     Toggle(String(localized: "settings.cloudLLM"), isOn: Binding(
                         get: { appState.filterConfig.cloudLLMEnabled },
                         set: {
-                            guard appState.isPro else { return }
+                            guard EntitlementManager.shared.hasEntitlement(.cloudLLM) else { return }
                             appState.filterConfig.cloudLLMEnabled = $0
                             Task { await appState.saveConfig() }
                         }
                     ))
-                    .disabled(!appState.isPro)
-                    if !appState.isPro {
+                    .disabled(!EntitlementManager.shared.hasEntitlement(.cloudLLM))
+                    if !EntitlementManager.shared.hasEntitlement(.cloudLLM) {
                         Text(String(localized: "settings.cloudLLMProHint"))
                             .font(.caption)
                             .foregroundStyle(.secondary)

@@ -26,6 +26,10 @@
 "rules.pattern" = "Pattern";
 "rules.add" = "Add Rule";
 "rules.save" = "Save";
+"rules.proRequired" = "Pro unlocks unlimited custom rules (free: up to 3).";
+"stats.proRequired" = "Upgrade to Pro for category breakdown charts.";
+"rules.proRequired" = "Pro unlocks unlimited custom rules (free: up to 3).";
+"stats.proRequired" = "Upgrade to Pro for category breakdown charts.";
 "settings.extension" = "Extension";
 "settings.extensionEnabled" = "Filter Enabled";
 "settings.privacy" = "Privacy";

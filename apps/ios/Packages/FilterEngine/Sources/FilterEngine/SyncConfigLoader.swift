@@ -18,6 +18,10 @@ public enum SyncConfigLoader {
         return try? Data(contentsOf: url)
     }
 
+    public static func coreMLModelURL(appGroupID: String = AppConstants.appGroupID) -> URL? {
+        containerURL(appGroupID)?.appendingPathComponent(AppConstants.AppGroupFiles.coreMLModel)
+    }
+
     public static func saveStatsIncrement(category: MessageCategory, appGroupID: String = AppConstants.appGroupID) {
         guard let url = containerURL(appGroupID)?.appendingPathComponent(AppConstants.AppGroupFiles.statsSnapshot) else {
             return

@@ -12,7 +12,7 @@ ok()   { echo "✓ $1"; PASS=$((PASS + 1)); }
 fail() { echo "✗ $1"; FAIL=$((FAIL + 1)); }
 
 echo "=== Go build ==="
-for svc in gateway model admin rules classify feedback; do
+for svc in gateway model admin rules classify feedback flywheel; do
   if (cd "services/$svc" && go build ./...); then
     ok "services/$svc"
   else
@@ -130,6 +130,16 @@ if test -f docs/app-store/metadata.md && test -f docs/app-store/review-notes.md;
   ok "app store metadata draft"
 else
   fail "app store metadata draft"
+fi
+if test -f docs/app-store/ASC_CHECKLIST.md && test -f fastlane/Fastfile; then
+  ok "app store ship checklist"
+else
+  fail "app store ship checklist"
+fi
+if test -f docs/deploy/TIER_MATRIX.md; then
+  ok "tier matrix doc"
+else
+  fail "tier matrix doc"
 fi
 
 echo "=== Support + mTLS ==="

@@ -55,6 +55,22 @@ public actor BlocklistStore {
         try data.write(to: url, options: .atomic)
     }
 
+    public func coreMLCompiledURL() throws -> URL {
+        try containerURL().appendingPathComponent(AppConstants.AppGroupFiles.coreMLModel)
+    }
+
+    public func saveRawCoreMLModel(_ data: Data) async throws -> URL {
+        let url = try containerURL().appendingPathComponent("spam_classifier.mlmodel")
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try data.write(to: url, options: .atomic)
+        return url
+    }
+
+    public func hasCoreMLModel() async -> Bool {
+        guard let url = try? coreMLCompiledURL() else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+
     public func incrementBlocked(category: MessageCategory) async throws {
         var stats = try await loadStats()
         let calendar = Calendar.current

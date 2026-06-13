@@ -17,10 +17,11 @@ type FeedbackHandler struct {
 	log         logger.Logger
 	store       ports.FeedbackStore
 	auditWriter audit.Writer
+	queue       ports.Queue
 }
 
-func NewFeedbackHandler(log logger.Logger, store ports.FeedbackStore, auditWriter audit.Writer) *FeedbackHandler {
-	return &FeedbackHandler{log: log, store: store, auditWriter: auditWriter}
+func NewFeedbackHandler(log logger.Logger, store ports.FeedbackStore, auditWriter audit.Writer, queue ports.Queue) *FeedbackHandler {
+	return &FeedbackHandler{log: log, store: store, auditWriter: auditWriter, queue: queue}
 }
 
 type feedbackRequest struct {
@@ -78,6 +79,10 @@ func (h *FeedbackHandler) Create(w http.ResponseWriter, r *http.Request) {
 			ID: uuid.NewString(), ActorID: "user", Action: "feedback.create",
 			ResourceType: "feedback", ResourceID: id, Timestamp: time.Now().UTC(),
 		})
+	}
+	if h.queue != nil {
+		payload, _ := json.Marshal(map[string]string{"id": id, "label": label})
+		_ = h.queue.Publish(r.Context(), "msgguard.flywheel.trigger", payload)
 	}
 	h.log.Info("feedback received", logger.Field{Key: "trace_id", Value: traceID})
 	writeJSON(w, feedbackResponse{ID: id, TraceID: traceID})

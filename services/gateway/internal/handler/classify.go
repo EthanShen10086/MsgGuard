@@ -10,7 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/EthanShen10086/voxera-kit/aiquota"
 	"github.com/EthanShen10086/voxera-kit/circuitbreaker"
+	"github.com/EthanShen10086/voxera-kit/featureflag"
 	"github.com/EthanShen10086/voxera-kit/observability/logger"
 
 	"github.com/EthanShen10086/msgguard/pkg/config"
@@ -24,6 +26,8 @@ type ClassifyHandler struct {
 	queue      ports.Queue
 	cfg        *config.Config
 	log        logger.Logger
+	quota      aiquota.Manager
+	flags      featureflag.Store
 }
 
 func NewClassifyHandler(
@@ -33,8 +37,13 @@ func NewClassifyHandler(
 	cfg *config.Config,
 	log logger.Logger,
 	queue ports.Queue,
+	quota aiquota.Manager,
+	flags featureflag.Store,
 ) *ClassifyHandler {
-	return &ClassifyHandler{classifier: classifier, breaker: breaker, cache: cache, queue: queue, cfg: cfg, log: log}
+	return &ClassifyHandler{
+		classifier: classifier, breaker: breaker, cache: cache, queue: queue,
+		cfg: cfg, log: log, quota: quota, flags: flags,
+	}
 }
 
 type classifyRequest struct {
@@ -48,6 +57,7 @@ type classifyResponse struct {
 	Category   string  `json:"category"`
 	Confidence float64 `json:"confidence"`
 	Cached     bool    `json:"cached,omitempty"`
+	Degraded   bool    `json:"degraded,omitempty"`
 }
 
 func (h *ClassifyHandler) Classify(w http.ResponseWriter, r *http.Request) {
@@ -100,8 +110,23 @@ func (h *ClassifyHandler) runInternal(r *http.Request, req classifyRequest) (cla
 		}
 	}
 
-	if !h.cfg.Features.CloudLLM || h.classifier == nil {
+	userID := req.UserID
+	if userID == "" {
+		userID = "anonymous"
+	}
+
+	if !h.cloudLLMEnabled(r.Context(), userID) || h.classifier == nil {
 		return heuristicClassify(req.Body), nil
+	}
+
+	if h.quota != nil {
+		if wh, _ := h.quota.IsWhitelisted(r.Context(), userID); !wh {
+			if err := h.quota.CheckQuota(r.Context(), userID, "qwen-turbo", estimateTokens(req.Body)); err != nil {
+				resp := heuristicClassify(req.Body)
+				resp.Degraded = true
+				return resp, nil
+			}
+		}
 	}
 
 	var category string
@@ -111,7 +136,17 @@ func (h *ClassifyHandler) runInternal(r *http.Request, req classifyRequest) (cla
 		return e
 	})
 	if err != nil {
-		return heuristicClassify(req.Body), nil
+		resp := heuristicClassify(req.Body)
+		resp.Degraded = true
+		return resp, nil
+	}
+
+	if h.quota != nil {
+		_ = h.quota.RecordUsage(r.Context(), aiquota.UsageRecord{
+			UserID: userID, Model: "qwen-turbo",
+			InputTokens: estimateTokens(req.Body), OutputTokens: 32,
+			Timestamp: time.Now().UTC(),
+		})
 	}
 
 	action := categoryToAction(category)
@@ -124,10 +159,29 @@ func (h *ClassifyHandler) runInternal(r *http.Request, req classifyRequest) (cla
 		}
 	}
 	if h.queue != nil {
-		payload, _ := json.Marshal(map[string]string{"body": req.Body, "category": category})
+		payload, _ := json.Marshal(map[string]string{"body": req.Body, "category": category, "user_id": userID})
 		_ = h.queue.Publish(r.Context(), "msgguard.classify.done", payload)
 	}
 	return result, nil
+}
+
+func (h *ClassifyHandler) cloudLLMEnabled(ctx context.Context, userID string) bool {
+	if h.cfg == nil || !h.cfg.Features.CloudLLM {
+		return false
+	}
+	if h.flags == nil {
+		return true
+	}
+	ok, _ := h.flags.IsEnabled(ctx, "cloud_llm", featureflag.EvalContext{UserID: userID})
+	return ok
+}
+
+func estimateTokens(text string) int {
+	n := len([]rune(text)) / 4
+	if n < 1 {
+		return 1
+	}
+	return n
 }
 
 func categoryToAction(category string) string {
@@ -154,6 +208,9 @@ func heuristicClassify(text string) classifyResponse {
 		if strings.Contains(lower, w) {
 			hits++
 		}
+	}
+	if strings.Contains(lower, "验证码") || strings.Contains(lower, "verification code") {
+		return classifyResponse{Action: "allow", Category: "ham", Confidence: 0.95}
 	}
 	if hits >= 2 {
 		return classifyResponse{Action: "junk", Category: "spam", Confidence: 0.9}
