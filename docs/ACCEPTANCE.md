@@ -25,10 +25,17 @@
 - [ ] `helm template msgguard deploy/helm/msgguard` → Deployment YAML
 
 ## Phase 2 — Architecture & Product Flywheel
-- [ ] `pkg/app/container.go` exists; gateway uses `app.NewContainer`
-- [ ] `curl -X POST localhost:8080/api/v1/auth/token` returns access_token
-- [ ] `GET /api/v1/feedback` without token → 401
-- [ ] `python ml/product/aggregate_metrics.py` → `ml/product/reports/weekly.json`
-- [ ] iOS App Group: `analytics.jsonl`, `crash_reporter.installed` after launch
-- [ ] `docs/COMMERCIAL_READINESS.md` 存在
-- [ ] Cookbook 00–26 每章有验收命令
+- [x] `pkg/app/container.go` exists; gateway uses `app.NewContainer`
+- [x] `curl -X POST localhost:8080/api/v1/auth/token` returns access_token
+- [x] `GET /api/v1/feedback` without token → 401
+- [x] `python ml/product/aggregate_metrics.py` → `ml/product/reports/weekly.json`
+- [x] iOS App Group: `analytics.jsonl`, `crash_reporter.installed` after launch
+- [x] `docs/COMMERCIAL_READINESS.md` 存在
+- [x] Cookbook 00–29 每章有验收命令
+
+## Phase 2.1 — MongoDB / Model Auth / Entitlements
+- [x] `pkg/adapters/mongodb` — feedback/rules/analytics Port 实现
+- [x] `DATABASE_DRIVER=mongodb` 切换（见 Cookbook 30）
+- [x] Model 服务 `/api/v1/models/register` 自身 RBAC（401/201）
+- [x] iOS `EntitlementProviding` + Keychain 持久化
+- [x] `make verify` / `bash scripts/verify.sh` 全量验收

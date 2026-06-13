@@ -23,6 +23,7 @@ import (
 	fsadapter "github.com/EthanShen10086/msgguard/pkg/adapters/filesystem"
 	llmadapter "github.com/EthanShen10086/msgguard/pkg/adapters/llm"
 	memadapters "github.com/EthanShen10086/msgguard/pkg/adapters/memory"
+	mongoadapters "github.com/EthanShen10086/msgguard/pkg/adapters/mongodb"
 	natsadapter "github.com/EthanShen10086/msgguard/pkg/adapters/nats"
 	pgadapters "github.com/EthanShen10086/msgguard/pkg/adapters/postgres"
 	redisadapters "github.com/EthanShen10086/msgguard/pkg/adapters/redis"
@@ -70,9 +71,10 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 	c.Tracer = tracer
 
 	dsn := envOr("DATABASE_DSN", cfg.Database.DSN)
-	c.FeedbackStore = wireFeedbackStore(cfg, dsn, log)
-	c.RuleStore = wireRuleStore(cfg, dsn, log)
-	c.AnalyticsStore = wireAnalyticsStore(cfg, dsn, log)
+	driver := envOr("DATABASE_DRIVER", cfg.Database.Driver)
+	c.FeedbackStore = wireFeedbackStore(cfg, driver, dsn, log)
+	c.RuleStore = wireRuleStore(cfg, driver, dsn, log)
+	c.AnalyticsStore = wireAnalyticsStore(cfg, driver, dsn, log)
 	c.Cache = wireCache(cfg, log)
 	c.Queue = wireQueue(cfg, log)
 	c.ModelRegistry = wireModelRegistry(cfg, log)
@@ -117,8 +119,14 @@ func (c *Container) Shutdown(ctx context.Context) {
 	}
 }
 
-func wireFeedbackStore(cfg *config.Config, dsn string, log logger.Logger) ports.FeedbackStore {
-	if dsn != "" && (cfg.Database.Driver == "postgres" || cfg.Database.Driver == "") {
+func wireFeedbackStore(cfg *config.Config, driver, dsn string, log logger.Logger) ports.FeedbackStore {
+	if dsn != "" && driver == "mongodb" {
+		if s, err := mongoadapters.NewFeedbackStore(dsn); err == nil {
+			log.Info("mongodb feedback store connected")
+			return s
+		}
+	}
+	if dsn != "" && (driver == "postgres" || driver == "") {
 		if s, err := pgadapters.NewFeedbackStore(dsn); err == nil {
 			log.Info("postgres feedback store connected")
 			return s
@@ -127,8 +135,14 @@ func wireFeedbackStore(cfg *config.Config, dsn string, log logger.Logger) ports.
 	return memadapters.NewFeedbackStore()
 }
 
-func wireRuleStore(cfg *config.Config, dsn string, log logger.Logger) ports.RuleStore {
-	if dsn != "" && cfg.Database.Driver == "postgres" {
+func wireRuleStore(cfg *config.Config, driver, dsn string, log logger.Logger) ports.RuleStore {
+	if dsn != "" && driver == "mongodb" {
+		if s, err := mongoadapters.NewRuleStore(dsn); err == nil {
+			log.Info("mongodb rule store connected")
+			return s
+		}
+	}
+	if dsn != "" && (driver == "postgres" || driver == "") {
 		if s, err := pgadapters.NewRuleStore(dsn); err == nil {
 			log.Info("postgres rule store connected")
 			return s
@@ -137,8 +151,14 @@ func wireRuleStore(cfg *config.Config, dsn string, log logger.Logger) ports.Rule
 	return memadapters.NewRuleStore()
 }
 
-func wireAnalyticsStore(cfg *config.Config, dsn string, log logger.Logger) ports.AnalyticsStore {
-	if dsn != "" && cfg.Database.Driver == "postgres" {
+func wireAnalyticsStore(cfg *config.Config, driver, dsn string, log logger.Logger) ports.AnalyticsStore {
+	if dsn != "" && driver == "mongodb" {
+		if s, err := mongoadapters.NewAnalyticsStore(dsn); err == nil {
+			log.Info("mongodb analytics store connected")
+			return s
+		}
+	}
+	if dsn != "" && (driver == "postgres" || driver == "") {
 		if s, err := pgadapters.NewAnalyticsStore(dsn); err == nil {
 			log.Info("postgres analytics store connected")
 			return s

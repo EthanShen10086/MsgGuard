@@ -13,6 +13,10 @@ DerivedData/
 ml/output/
 ml/data/
 ml/benchmark/reports/
+ml/product/reports/
+
+# Model registry runtime state
+deploy/models/registry.json
 
 # Go build artifacts
 **/server

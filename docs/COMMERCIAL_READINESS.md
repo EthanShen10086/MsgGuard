@@ -29,3 +29,7 @@ Only change `deploy/config.*.yaml` and run matching `deploy/tiers/*.sh` — no b
 ## Architecture (Phase 2)
 - `pkg/app/container.go` — unified DI / IoC root
 - All stores wired via config: feedback, rules, analytics, cache, queue, model registry
+- `pkg/adapters/mongodb` — alternate DB driver (Cookbook 30)
+- `pkg/httpauth` — shared RBAC middleware (gateway + model service)
+- iOS `EntitlementProviding` — ScrollCap-aligned subscription entitlements
+- `scripts/verify.sh` — one-shot acceptance runner

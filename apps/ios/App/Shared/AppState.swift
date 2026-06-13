@@ -13,7 +13,7 @@ final class AppState {
     var onboardingCompleted = false
     var userMode: UserMode = .standard
     var lastTraceID = ""
-    var isPro = false
+    var isPro: Bool { EntitlementManager.shared.isPro }
 
     private let store = BlocklistStore()
     private var engine = HybridFilterEngine()

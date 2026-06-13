@@ -16,6 +16,7 @@
 		3FB9E58445FF5FAA80C40851 /* SharedModels in Frameworks */ = {isa = PBXBuildFile; productRef = F1004CBA14935E6F309FBA85 /* SharedModels */; };
 		41EC397F81A06B08046BFB73 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1399A81AE75F56AAAFF1BFC /* CrashReporter.swift */; };
 		53FDC06D672D137528BBFFA4 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A210CBBCD0F45EC5FD790673 /* DesignSystem */; };
+		5BA1B7D8FF757423687F1F1B /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D0DC8F91175985370061C8 /* EntitlementService.swift */; };
 		5C2709E04A18F9B0642E8876 /* BlocklistStore in Frameworks */ = {isa = PBXBuildFile; productRef = 9CB9BE75591F030487819F49 /* BlocklistStore */; };
 		606EC2CF58F5481ACAEEAFBC /* FilterEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 638A194EF061E8ACC6CE1C4C /* FilterEngine */; };
 		64CF1058ED990F8EF4FB3DBE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C641AFC826296E833C0DFD7E /* Localizable.strings */; };
@@ -75,6 +76,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04D0DC8F91175985370061C8 /* EntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
 		0826E774FA3D1ECC950EE73C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		090E22609FFFD0A15C542CA2 /* MGLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLogger.swift; sourceTree = "<group>"; };
 		0C44C6982690CE1DCB051E2C /* SharedModels */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SharedModels; path = Packages/SharedModels; sourceTree = SOURCE_ROOT; };
@@ -211,6 +213,7 @@
 		628F2D764060B24FC1B260B6 /* Store */ = {
 			isa = PBXGroup;
 			children = (
+				04D0DC8F91175985370061C8 /* EntitlementService.swift */,
 				41EDA75F005C377ED44C84EE /* SubscriptionView.swift */,
 			);
 			path = Store;
@@ -438,6 +441,7 @@
 				378CC2F3550A0D4BF68E58E0 /* ContentView.swift in Sources */,
 				41EC397F81A06B08046BFB73 /* CrashReporter.swift in Sources */,
 				64E9BB5167612740CFD97C9C /* DashboardView.swift in Sources */,
+				5BA1B7D8FF757423687F1F1B /* EntitlementService.swift in Sources */,
 				E10085297208E4E88E01B7A7 /* FeedbackView.swift in Sources */,
 				877A096741995E828D2F1F1B /* HelpView.swift in Sources */,
 				238180E768604D6F404A2184 /* MGError.swift in Sources */,

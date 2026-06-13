@@ -2,7 +2,6 @@ import StoreKit
 import SwiftUI
 
 struct SubscriptionView: View {
-    @Environment(AppState.self) private var appState
     @State private var products: [Product] = []
     @State private var isLoading = false
 
@@ -43,7 +42,7 @@ struct SubscriptionView: View {
             let result = try await product.purchase()
             if case let .success(verification) = result,
                case .verified = verification {
-                appState.isPro = true
+                EntitlementManager.shared.grantPro(source: .appStoreIAP, transactionId: product.id)
                 AnalyticsManager.shared.track(.purchaseCompleted(productId: product.id))
             }
         } catch {

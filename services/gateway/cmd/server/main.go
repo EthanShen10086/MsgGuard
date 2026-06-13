@@ -3,6 +3,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/EthanShen10086/msgguard/pkg/app"
 	"github.com/EthanShen10086/msgguard/pkg/config"
@@ -14,6 +15,11 @@ func main() {
 	cfg, err := config.Load(cfgPath)
 	if err != nil {
 		panic(err)
+	}
+	if p := os.Getenv("PORT"); p != "" {
+		if n, err := strconv.Atoi(p); err == nil {
+			cfg.Gateway.Port = n
+		}
 	}
 	container, err := app.NewContainer(cfg)
 	if err != nil {

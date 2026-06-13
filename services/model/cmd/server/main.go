@@ -11,6 +11,8 @@ import (
 	"sync"
 
 	fsadapter "github.com/EthanShen10086/msgguard/pkg/adapters/filesystem"
+	memadapters "github.com/EthanShen10086/msgguard/pkg/adapters/memory"
+	"github.com/EthanShen10086/msgguard/pkg/httpauth"
 	"github.com/EthanShen10086/msgguard/pkg/ports"
 )
 
@@ -20,11 +22,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	auth := memadapters.NewAuth(envOr("AUTH_SECRET", "msgguard-dev-secret"))
 	srv := &server{registry: reg, dir: dir}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("ok")) })
 	mux.HandleFunc("/api/v1/models/latest", srv.latest)
-	mux.HandleFunc("/api/v1/models/register", srv.register)
+	mux.HandleFunc("/api/v1/models/register", httpauth.RequirePermission(auth, auth, "models", "write", srv.register))
 	mux.HandleFunc("/api/v1/models/", srv.download)
 	port := envOr("PORT", "8083")
 	http.ListenAndServe(":"+port, mux)
@@ -37,6 +40,10 @@ type server struct {
 }
 
 func (s *server) latest(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	locale := r.URL.Query().Get("locale")
 	if locale == "" {
 		locale = "zh-Hans"
@@ -75,6 +82,10 @@ func (s *server) register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) download(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/v1/models/"), "/")
 	if len(parts) < 3 || parts[1] != "download" {
 		http.NotFound(w, r)
@@ -83,7 +94,6 @@ func (s *server) download(w http.ResponseWriter, r *http.Request) {
 	version, name := parts[0], parts[2]
 	data, err := s.registry.GetArtifact(r.Context(), version, name)
 	if err != nil || data == nil {
-		// Try filesystem fallback from ml/output
 		fallback := filepath.Join(s.dir, "..", "..", "ml", "output", name)
 		data, err = os.ReadFile(fallback)
 	}

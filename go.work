@@ -4,13 +4,14 @@ use (
 	./pkg/adapters
 	./pkg/app
 	./pkg/config
+	./pkg/httpauth
 	./pkg/ports
 	./services/admin
-	./services/gateway
-	./services/rules
 	./services/classify
-	./services/model
 	./services/feedback
+	./services/gateway
+	./services/model
+	./services/rules
 )
 
 replace (

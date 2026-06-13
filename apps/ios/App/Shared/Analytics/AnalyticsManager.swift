@@ -12,6 +12,8 @@ public enum AnalyticsEvent: Sendable {
     case settingsChanged(key: String, value: String)
     case error(domain: String, code: String)
     case purchaseCompleted(productId: String)
+    case entitlementGranted(source: String)
+    case entitlementRevoked
 }
 
 public protocol AnalyticsTracking: Sendable {
@@ -79,6 +81,8 @@ public final class AnalyticsManager: AnalyticsTracking, @unchecked Sendable {
         case .settingsChanged(let key, let value): name = "settings_changed"; props["key"] = key; props["value"] = value
         case .error(let domain, let code): name = "error"; props["domain"] = domain; props["code"] = code
         case .purchaseCompleted(let productId): name = "purchase_completed"; props["product_id"] = productId
+        case .entitlementGranted(let source): name = "entitlement_granted"; props["source"] = source
+        case .entitlementRevoked: name = "entitlement_revoked"
         }
         return [
             "name": name,

@@ -1,0 +1,4 @@
+# MongoDB driver config — swap deploy/config.yaml driver/dsn only.
+database:
+  driver: mongodb
+  dsn: "mongodb://msgguard:msgguard@localhost:27017/?authSource=admin"
