@@ -24,7 +24,11 @@
 - [ ] `./deploy/tiers/tier1-compose.sh` → services up
 - [ ] `helm template msgguard deploy/helm/msgguard` → Deployment YAML
 
-## Docs
-- [ ] `docs/api/openapi.yaml` 存在
+## Phase 2 — Architecture & Product Flywheel
+- [ ] `pkg/app/container.go` exists; gateway uses `app.NewContainer`
+- [ ] `curl -X POST localhost:8080/api/v1/auth/token` returns access_token
+- [ ] `GET /api/v1/feedback` without token → 401
+- [ ] `python ml/product/aggregate_metrics.py` → `ml/product/reports/weekly.json`
+- [ ] iOS App Group: `analytics.jsonl`, `crash_reporter.installed` after launch
 - [ ] `docs/COMMERCIAL_READINESS.md` 存在
 - [ ] Cookbook 00–26 每章有验收命令

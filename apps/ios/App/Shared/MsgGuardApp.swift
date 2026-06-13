@@ -1,8 +1,13 @@
+import SharedModels
 import SwiftUI
 
 @main
 struct MsgGuardApp: App {
     @State private var appState = AppState()
+
+    init() {
+        CrashReporter.shared.install()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -10,10 +15,20 @@ struct MsgGuardApp: App {
                 .environment(appState)
                 .task {
                     await appState.loadAll()
-                    AnalyticsManager.shared.track(.appLaunched)
-                    let sync = SyncService()
-                    try? await sync.syncRules()
-                    try? await ModelUpdateService().checkAndUpdate()
+                    Task(priority: .utility) {
+                        AnalyticsManager.shared.track(.appLaunched)
+                        let sync = SyncService()
+                        try? await sync.syncRules()
+                        try? await ModelUpdateService().checkAndUpdate()
+                        let perf = PerformanceMonitor.loadAggregateStats()
+                        if !perf.isEmpty {
+                            AnalyticsManager.shared.track(.filterCompleted(
+                                category: "aggregate",
+                                layer: "p99=\(Int(perf["max_ms"] ?? 0))ms"
+                            ))
+                        }
+                        await AnalyticsManager.shared.flush()
+                    }
                 }
                 .alert(
                     String(localized: "error.title"),

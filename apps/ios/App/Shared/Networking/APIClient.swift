@@ -62,6 +62,7 @@ public actor APIClient {
         }
         if let returnedTrace = http.value(forHTTPHeaderField: "X-Request-ID") {
             lastTraceID = returnedTrace
+            TraceContext.update(returnedTrace)
         }
         return try JSONDecoder().decode(T.self, from: data)
     }

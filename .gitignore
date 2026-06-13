@@ -14,8 +14,10 @@ ml/output/
 ml/data/
 ml/benchmark/reports/
 
+# Go build artifacts
+**/server
+!services/*/cmd/server/
+
 # Keep seed and benchmark test sets
 !ml/datasets/
 !ml/datasets/**
-services/gateway/server
-services/model/server

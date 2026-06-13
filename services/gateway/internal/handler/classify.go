@@ -8,13 +8,9 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
-	"github.com/EthanShen10086/voxera-kit/aiquota"
-	ff "github.com/EthanShen10086/voxera-kit/featureflag"
-	"github.com/EthanShen10086/voxera-kit/llm"
-	"github.com/EthanShen10086/voxera-kit/llm/prompt"
+	"github.com/EthanShen10086/voxera-kit/circuitbreaker"
 	"github.com/EthanShen10086/voxera-kit/observability/logger"
 
 	"github.com/EthanShen10086/msgguard/pkg/config"
@@ -22,19 +18,23 @@ import (
 )
 
 type ClassifyHandler struct {
-	router    *llm.Router
-	quota     aiquota.Manager
-	flags     ff.Store
-	cfg       *config.Config
-	log       logger.Logger
-	cache     ports.Cache
-	mu        sync.Mutex
-	failCount int
-	openUntil time.Time
+	classifier ports.LLMClassifier
+	breaker    circuitbreaker.CircuitBreaker
+	cache      ports.Cache
+	queue      ports.Queue
+	cfg        *config.Config
+	log        logger.Logger
 }
 
-func NewClassifyHandler(router *llm.Router, quota aiquota.Manager, flags ff.Store, cfg *config.Config, log logger.Logger, cache ports.Cache) *ClassifyHandler {
-	return &ClassifyHandler{router: router, quota: quota, flags: flags, cfg: cfg, log: log, cache: cache}
+func NewClassifyHandler(
+	classifier ports.LLMClassifier,
+	breaker circuitbreaker.CircuitBreaker,
+	cache ports.Cache,
+	cfg *config.Config,
+	log logger.Logger,
+	queue ports.Queue,
+) *ClassifyHandler {
+	return &ClassifyHandler{classifier: classifier, breaker: breaker, cache: cache, queue: queue, cfg: cfg, log: log}
 }
 
 type classifyRequest struct {
@@ -100,72 +100,45 @@ func (h *ClassifyHandler) runInternal(r *http.Request, req classifyRequest) (cla
 		}
 	}
 
-	if !h.cfg.Features.CloudLLM {
+	if !h.cfg.Features.CloudLLM || h.classifier == nil {
 		return heuristicClassify(req.Body), nil
 	}
 
-	if h.isCircuitOpen() {
-		return heuristicClassify(req.Body), nil
-	}
-
-	if h.router == nil {
-		return heuristicClassify(req.Body), nil
-	}
-
-	tmpl := prompt.Classify
-	_, userPrompt := tmpl.Render(map[string]any{
-		"Categories": "spam, promotion, ham, phishing, transaction",
-		"Text":       req.Body,
-	})
-	resp, err := h.router.Route(r.Context(), llm.Request{
-		Messages: []llm.Message{
-			{Role: llm.RoleSystem, Content: tmpl.System},
-			{Role: llm.RoleUser, Content: userPrompt},
-		},
+	var category string
+	err := h.breaker.Execute(r.Context(), func() error {
+		var e error
+		category, e = h.classifier.Classify(r.Context(), req.Body)
+		return e
 	})
 	if err != nil {
-		h.recordFailure()
 		return heuristicClassify(req.Body), nil
 	}
-	h.recordSuccess()
-	category := strings.TrimSpace(strings.ToLower(resp.Content))
-	action := "allow"
-	switch category {
-	case "spam", "phishing":
-		action = "junk"
-	case "promotion":
-		action = "promotion"
-	}
+
+	action := categoryToAction(category)
 	result := classifyResponse{Action: action, Category: category, Confidence: 0.85}
+
 	if h.cache != nil {
 		key := cacheKey(req.Body)
 		if data, err := json.Marshal(result); err == nil {
 			_ = h.cache.Set(context.Background(), key, data, 24*time.Hour)
 		}
 	}
+	if h.queue != nil {
+		payload, _ := json.Marshal(map[string]string{"body": req.Body, "category": category})
+		_ = h.queue.Publish(r.Context(), "msgguard.classify.done", payload)
+	}
 	return result, nil
 }
 
-func (h *ClassifyHandler) isCircuitOpen() bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	return time.Now().Before(h.openUntil)
-}
-
-func (h *ClassifyHandler) recordFailure() {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	h.failCount++
-	if h.failCount >= 3 {
-		h.openUntil = time.Now().Add(30 * time.Second)
-		h.failCount = 0
+func categoryToAction(category string) string {
+	switch category {
+	case "spam", "phishing":
+		return "junk"
+	case "promotion":
+		return "promotion"
+	default:
+		return "allow"
 	}
-}
-
-func (h *ClassifyHandler) recordSuccess() {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	h.failCount = 0
 }
 
 func cacheKey(body string) string {

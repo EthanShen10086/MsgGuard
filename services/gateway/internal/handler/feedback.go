@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/EthanShen10086/voxera-kit/audit"
 	"github.com/EthanShen10086/voxera-kit/observability/logger"
 	"github.com/google/uuid"
 
@@ -13,8 +14,13 @@ import (
 )
 
 type FeedbackHandler struct {
-	log   logger.Logger
-	store ports.FeedbackStore
+	log         logger.Logger
+	store       ports.FeedbackStore
+	auditWriter audit.Writer
+}
+
+func NewFeedbackHandler(log logger.Logger, store ports.FeedbackStore, auditWriter audit.Writer) *FeedbackHandler {
+	return &FeedbackHandler{log: log, store: store, auditWriter: auditWriter}
 }
 
 type feedbackRequest struct {
@@ -29,10 +35,6 @@ type feedbackRequest struct {
 type feedbackResponse struct {
 	ID      string `json:"id"`
 	TraceID string `json:"traceID"`
-}
-
-func NewFeedbackHandler(log logger.Logger, store ports.FeedbackStore) *FeedbackHandler {
-	return &FeedbackHandler{log: log, store: store}
 }
 
 func (h *FeedbackHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +73,12 @@ func (h *FeedbackHandler) Create(w http.ResponseWriter, r *http.Request) {
 		TraceID: traceID, CreatedAt: time.Now().UTC(),
 	}
 	_ = h.store.Create(r.Context(), item)
+	if h.auditWriter != nil {
+		_ = h.auditWriter.Write(r.Context(), audit.Entry{
+			ID: uuid.NewString(), ActorID: "user", Action: "feedback.create",
+			ResourceType: "feedback", ResourceID: id, Timestamp: time.Now().UTC(),
+		})
+	}
 	h.log.Info("feedback received", logger.Field{Key: "trace_id", Value: traceID})
 	writeJSON(w, feedbackResponse{ID: id, TraceID: traceID})
 }

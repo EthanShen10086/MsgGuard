@@ -1,0 +1,11 @@
+{
+  "title": "MsgGuard Product Metrics",
+  "panels": [
+    {"type": "stat", "title": "App Launches (7d)", "targets": [{"expr": "sum(analytics_events{name=\"app_launched\"})"}]},
+    {"type": "graph", "title": "Filter Completed by Layer", "targets": [{"expr": "sum by (layer) (analytics_filter_completed)"}]},
+    {"type": "graph", "title": "False Positive Rate Trend", "targets": [{"expr": "benchmark_fpr"}]},
+    {"type": "graph", "title": "Shadow Disagree Rate", "targets": [{"expr": "shadow_disagree_rate"}]},
+    {"type": "stat", "title": "Purchases (7d)", "targets": [{"expr": "sum(analytics_events{name=\"purchase_completed\"})"}]},
+    {"type": "stat", "title": "Feedback Total", "targets": [{"expr": "feedback_total"}]}
+  ]
+}

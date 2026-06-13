@@ -32,6 +32,7 @@
 		A48D880179400BB3A8C1322D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDE61278BE8CA808D8CE797 /* AppState.swift */; };
 		ACE2C8C76F431B7DD4CFE41B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C626989D27EF5318B2426822 /* OnboardingView.swift */; };
 		BB66305C76BE3083C6C150DD /* SamplesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192971F34900E9A751B11DBE /* SamplesView.swift */; };
+		BE6B592C5642BD8E167F622B /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC132877AAA4304B79E7A7F /* NetworkClient.swift */; };
 		C76ADF190284C48A159DDC50 /* FilterEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD2FFD9EC823A465C68C0E0 /* FilterEngine */; };
 		CF266FB241E1A1A292AA9BBA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9577F4AE88913F20ED43D7 /* SettingsView.swift */; };
 		D4055B9F90BE1EB10D280DF2 /* MsgGuardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7259FE518A8581DB3F0864 /* MsgGuardApp.swift */; };
@@ -90,6 +91,7 @@
 		3FDE61278BE8CA808D8CE797 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		41EDA75F005C377ED44C84EE /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
 		42D6041BED47533D9961EF4D /* DesignSystem */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DesignSystem; path = Packages/DesignSystem; sourceTree = SOURCE_ROOT; };
+		4FC132877AAA4304B79E7A7F /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		64DAC77CF64DD442F074FEB1 /* MsgGuard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MsgGuard.entitlements; sourceTree = "<group>"; };
 		6F5C2D61AA6FD314CDA48486 /* PerformanceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceMonitor.swift; sourceTree = "<group>"; };
 		7803C36B970B7B4DE154C7B6 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 			children = (
 				2368DC1EB8030EF4D2B81ED7 /* APIClient.swift */,
 				A6770421CC37A0F670549A57 /* ModelUpdateService.swift */,
+				4FC132877AAA4304B79E7A7F /* NetworkClient.swift */,
 				0D37935CEE0452D32D215998 /* SyncService.swift */,
 			);
 			path = Networking;
@@ -441,6 +444,7 @@
 				77665894BBBE75670514BA3B /* MGLogger.swift in Sources */,
 				3CDD83639AE5C1F1ADF76659 /* ModelUpdateService.swift in Sources */,
 				D4055B9F90BE1EB10D280DF2 /* MsgGuardApp.swift in Sources */,
+				BE6B592C5642BD8E167F622B /* NetworkClient.swift in Sources */,
 				ACE2C8C76F431B7DD4CFE41B /* OnboardingView.swift in Sources */,
 				98D6D2D30F8FE4FA4D129E4D /* PerformanceMonitor.swift in Sources */,
 				14026756C83C9B935F67B9CF /* RulesView.swift in Sources */,

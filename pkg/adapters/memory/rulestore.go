@@ -18,7 +18,8 @@ func (s *RuleStore) GetLatest(ctx context.Context) (*ports.RuleBundle, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if s.latest == nil {
-		return &ports.RuleBundle{Version: "1.0.0", Checksum: "seed", Payload: []byte(`{"keywords":["免费","中奖"]}`)}, nil
+		payload := []byte(`{"version":"1.0.0","locale":"zh-Hans","checksum":"seed","keywords_block":["免费领取","中奖","贷款"],"keywords_allow":["验证码","verification code"]}`)
+		return &ports.RuleBundle{Version: "1.0.0", Checksum: "seed", Payload: payload}, nil
 	}
 	return s.latest, nil
 }
