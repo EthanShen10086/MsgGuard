@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-config
+data:
+  CONFIG_PATH: /app/deploy/config.yaml
+  DATABASE_DSN: {{ .Values.database.dsn | quote }}
+  REDIS_URL: {{ .Values.redis.url | quote }}

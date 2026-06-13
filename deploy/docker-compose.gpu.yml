@@ -1,0 +1,14 @@
+services:
+  ml-train:
+    image: python:3.11-slim
+    working_dir: /app/ml
+    volumes:
+      - ../ml:/app/ml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: ["bash", "-c", "pip install -r requirements.txt && make train"]

@@ -1,0 +1,14 @@
+FROM golang:1.25-alpine AS builder
+WORKDIR /src
+COPY go.work go.work.sum ./
+COPY pkg ./pkg
+COPY services/model ./services/model
+WORKDIR /src/services/model
+RUN go build -o /model ./cmd/server
+
+FROM alpine:3.20
+WORKDIR /app
+COPY --from=builder /model /app/model
+RUN mkdir -p /app/deploy/models
+EXPOSE 8083
+CMD ["/app/model"]

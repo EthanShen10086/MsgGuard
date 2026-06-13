@@ -1,0 +1,8 @@
+replicaCount: 1
+ingress:
+  host: staging-api.msgguard.app
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 3
+config:
+  cloudLLM: false

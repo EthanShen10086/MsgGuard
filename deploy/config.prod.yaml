@@ -1,0 +1,12 @@
+features:
+  cloud_llm: true
+database:
+  driver: postgres
+gateway:
+  port: 8080
+  rate_limit_rps: 500
+observability:
+  trace_sample_rate: 0.1
+  otel_endpoint: "jaeger-collector:4318"
+llm:
+  daily_quota_free: 10

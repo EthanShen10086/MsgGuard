@@ -1,0 +1,4 @@
+f1_min: 0.85
+fpr_max: 0.02
+fnr_max: 0.15
+latency_p99_ms: 15

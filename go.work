@@ -1,0 +1,26 @@
+go 1.25.0
+
+use (
+	./pkg/adapters
+	./pkg/config
+	./pkg/ports
+	./services/gateway
+	./services/rules
+	./services/classify
+	./services/model
+	./services/feedback
+)
+
+replace (
+	github.com/EthanShen10086/voxera-kit/aiquota => ../voxera-kit/backend/aiquota
+	github.com/EthanShen10086/voxera-kit/audit => ../voxera-kit/backend/audit
+	github.com/EthanShen10086/voxera-kit/cache => ../voxera-kit/backend/cache
+	github.com/EthanShen10086/voxera-kit/featureflag => ../voxera-kit/backend/featureflag
+	github.com/EthanShen10086/voxera-kit/llm => ../voxera-kit/backend/llm
+	github.com/EthanShen10086/voxera-kit/loadshed => ../voxera-kit/backend/loadshed
+	github.com/EthanShen10086/voxera-kit/middleware => ../voxera-kit/backend/middleware
+	github.com/EthanShen10086/voxera-kit/observability => ../voxera-kit/backend/observability
+	github.com/EthanShen10086/voxera-kit/pii => ../voxera-kit/backend/pii
+	github.com/EthanShen10086/voxera-kit/ratelimiter => ../voxera-kit/backend/ratelimiter
+	github.com/EthanShen10086/voxera-kit/security => ../voxera-kit/backend/security
+)

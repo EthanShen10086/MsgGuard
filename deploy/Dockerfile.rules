@@ -1,0 +1,12 @@
+FROM golang:1.25-alpine AS builder
+WORKDIR /src
+COPY go.work go.work.sum ./
+COPY pkg ./pkg
+COPY services/rules ./services/rules
+WORKDIR /src/services/rules
+RUN go build -o /rules ./cmd/server
+
+FROM alpine:3.20
+COPY --from=builder /rules /rules
+EXPOSE 8081
+CMD ["/rules"]

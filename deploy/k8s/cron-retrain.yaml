@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: msgguard-retrain
+spec:
+  schedule: "0 3 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: retrain
+              image: python:3.11-slim
+              command: ["bash", "/app/ml/flywheel/schedule_retrain.sh"]
+              volumeMounts:
+                - name: ml
+                  mountPath: /app/ml
+      volumes:
+        - name: ml
+          persistentVolumeClaim:
+            claimName: msgguard-ml-data

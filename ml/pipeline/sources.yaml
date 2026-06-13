@@ -1,0 +1,19 @@
+# MsgGuard data sources — licenses and URLs
+sources:
+  - id: uci_sms
+    name: UCI SMS Spam Collection
+    url: https://archive.ics.uci.edu/ml/machine-learning-databases/00228/smsspamcollection.zip
+    license: CC0/Public Domain
+    format: tsv
+    locale: en
+  - id: fbs_sms
+    name: FBS SMS Dataset
+    url: https://github.com/Cypher-Z/FBS_SMS_Dataset
+    license: Research use — cite CCS'20
+    format: csv
+    locale: zh
+  - id: hf_multilingual
+    name: SMS Spam Multilingual
+    dataset: dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset
+    license: Check HF card
+    locale: multi

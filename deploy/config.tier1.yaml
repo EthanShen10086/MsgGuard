@@ -1,0 +1,9 @@
+features:
+  cloud_llm: false
+database:
+  driver: postgres
+  dsn: "postgres://msgguard:msgguard@postgres:5432/msgguard?sslmode=disable"
+cache:
+  redis_enabled: true
+observability:
+  otel_endpoint: "jaeger:4318"

@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: MsgGuard API
+  version: 1.0.0
+  description: Rules, models, classify, feedback, analytics, shadow endpoints
+servers:
+  - url: http://localhost:8080
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: ok
+  /api/v1/classify:
+    post:
+      summary: Classify SMS (sync)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassifyRequest"
+      responses:
+        "200":
+          description: Classification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassifyResponse"
+  /api/v1/classify/defer:
+    post:
+      summary: Classify for Message Filter defer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassifyRequest"
+      responses:
+        "200":
+          description: Defer action
+  /api/v1/classify/shadow:
+    post:
+      summary: Shadow compare local vs cloud
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassifyRequest"
+      responses:
+        "200":
+          description: Shadow comparison
+  /api/v1/feedback:
+    post:
+      summary: Submit feedback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackRequest"
+      responses:
+        "200":
+          description: Created
+    get:
+      summary: List feedback (ML flywheel)
+      responses:
+        "200":
+          description: Feedback items
+  /api/v1/analytics:
+    post:
+      summary: Ingest analytics event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                props: { type: object }
+      responses:
+        "200":
+          description: ok
+  /api/v1/rules/latest:
+    get:
+      summary: Latest rule bundle
+      responses:
+        "200":
+          description: Rules metadata
+  /api/v1/models/latest:
+    get:
+      summary: Latest model metadata
+      parameters:
+        - name: locale
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Model metadata with ETag
+  /api/v1/models/register:
+    post:
+      summary: Register model version (ML publish)
+      responses:
+        "201":
+          description: registered
+components:
+  schemas:
+    ClassifyRequest:
+      type: object
+      properties:
+        sender: { type: string }
+        body: { type: string }
+        user_id: { type: string }
+    ClassifyResponse:
+      type: object
+      properties:
+        action: { type: string, enum: [allow, junk, promotion, none] }
+        category: { type: string }
+        confidence: { type: number }
+        cached: { type: boolean }
+    FeedbackRequest:
+      type: object
+      properties:
+        body: { type: string }
+        label: { type: string }
+        locale: { type: string }
+        traceID: { type: string }

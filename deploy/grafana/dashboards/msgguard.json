@@ -1,0 +1,7 @@
+{
+  "title": "MsgGuard Overview",
+  "panels": [
+    {"type": "stat", "title": "Gateway Health", "targets": [{"expr": "up{job=\"msgguard-gateway\"}"}]},
+    {"type": "graph", "title": "Request Rate", "targets": [{"expr": "rate(http_requests_total[5m])"}]}
+  ]
+}

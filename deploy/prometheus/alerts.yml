@@ -1,0 +1,17 @@
+groups:
+  - name: msgguard
+    rules:
+      - alert: GatewayDown
+        expr: up{job="msgguard-gateway"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MsgGuard gateway is down"
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High 5xx error rate on gateway"

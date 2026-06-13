@@ -1,0 +1,14 @@
+FROM golang:1.25-alpine AS builder
+WORKDIR /src
+COPY go.work go.work.sum ./
+COPY pkg ./pkg
+COPY services/gateway ./services/gateway
+WORKDIR /src/services/gateway
+RUN go build -o /gateway ./cmd/server
+
+FROM alpine:3.20
+WORKDIR /app
+COPY --from=builder /gateway /app/gateway
+COPY deploy/config.yaml /app/deploy/config.yaml
+EXPOSE 8080
+CMD ["/app/gateway"]

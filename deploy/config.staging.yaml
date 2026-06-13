@@ -1,0 +1,8 @@
+features:
+  cloud_llm: false
+database:
+  driver: postgres
+gateway:
+  port: 8080
+observability:
+  otel_endpoint: "jaeger-collector:4318"

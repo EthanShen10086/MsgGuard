@@ -1,0 +1,5 @@
+{
+  "messagefilter": {
+    "apps": ["TEAMID.com.ethanshen.msgguard.filter", "TEAMID.com.ethanshen.msgguard"]
+  }
+}

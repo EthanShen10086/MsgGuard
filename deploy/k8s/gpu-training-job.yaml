@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: msgguard-ml-train
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: train
+          image: python:3.11-slim
+          command: ["bash", "-c", "cd /app/ml && pip install -r requirements.txt && make train && make benchmark"]
+          volumeMounts:
+            - name: ml
+              mountPath: /app/ml
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+      volumes:
+        - name: ml
+          persistentVolumeClaim:
+            claimName: msgguard-ml-data
