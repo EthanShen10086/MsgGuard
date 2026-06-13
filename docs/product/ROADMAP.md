@@ -11,8 +11,8 @@
 | P0 | Adversarial benchmark expansion | FPR near threshold |
 | P1 | Onboarding A/B | conversion < target |
 | P1 | Shadow mode dashboard | LLM opt-in users |
-| P2 | Multi-locale model | en locale F1 gap |
-| P3 | Email filter extension | user requests |
+| P2 | Multi-locale model | per-locale train/benchmark/OTA (`make train-all-locales`) |
+| P3 | Email filter extension (macOS MailKit) | [docs/product/MAIL_EXTENSION.md](product/MAIL_EXTENSION.md) |
 
 ## Last Metrics Snapshot
 Run `python ml/product/aggregate_metrics.py` and paste summary here each sprint.

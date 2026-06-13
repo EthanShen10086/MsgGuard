@@ -13,6 +13,7 @@ actor ModelUpdateService {
         let version: String
         let checksum: String
         let url: String
+        let bayes_url: String?
     }
 
     func checkAndUpdate(locale: String? = nil) async throws {
@@ -47,7 +48,20 @@ actor ModelUpdateService {
         updated.modelVersion = meta.version
         updated.locale = activeLocale
         try await store.saveConfig(updated)
+        if let bayesPath = meta.bayes_url {
+            try await downloadBayes(relativePath: bayesPath, locale: activeLocale)
+        }
         WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    private func downloadBayes(relativePath: String, locale: String) async throws {
+        let url = resolveURL(relativePath)
+        let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
+        guard let http = response as? HTTPURLResponse, (200 ... 299).contains(http.statusCode) else {
+            return
+        }
+        try await store.saveBayesModel(data, locale: locale)
+        MGLogger.sync.info("Bayes model updated locale=\(locale)")
     }
 
     private func resolveURL(_ path: String) -> URL {

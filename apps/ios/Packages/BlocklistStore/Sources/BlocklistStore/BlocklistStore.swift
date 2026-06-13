@@ -43,16 +43,24 @@ public actor BlocklistStore {
         try data.write(to: url, options: .atomic)
     }
 
-    public func loadBayesModel() async throws -> Data? {
-        let url = try bayesURL()
+    public func loadBayesModel(locale: String = "zh-Hans") async throws -> Data? {
+        let url = try bayesURL(locale: locale)
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         return try Data(contentsOf: url)
     }
 
-    public func saveBayesModel(_ data: Data) async throws {
-        let url = try bayesURL()
+    public func saveBayesModel(_ data: Data, locale: String = "zh-Hans") async throws {
+        let url = try bayesURL(locale: locale)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         try data.write(to: url, options: .atomic)
+    }
+
+    public func loadBayesModel() async throws -> Data? {
+        try await loadBayesModel(locale: "zh-Hans")
+    }
+
+    public func saveBayesModel(_ data: Data) async throws {
+        try await saveBayesModel(data, locale: "zh-Hans")
     }
 
     public func coreMLCompiledURL(locale: String = "zh-Hans") throws -> URL {
@@ -103,8 +111,9 @@ public actor BlocklistStore {
         try containerURL().appendingPathComponent(AppConstants.AppGroupFiles.statsSnapshot)
     }
 
-    private func bayesURL() throws -> URL {
-        try containerURL().appendingPathComponent(AppConstants.AppGroupFiles.bayesModel)
+    private func bayesURL(locale: String = "zh-Hans") throws -> URL {
+        let safe = locale.replacingOccurrences(of: "/", with: "_")
+        return try containerURL().appendingPathComponent("bayes_\(safe).json")
     }
 }
 

@@ -29,7 +29,7 @@ done
 
 echo "=== ML benchmark ==="
 BENCH_LOG="$(cd ml && make benchmark 2>&1)" || true
-if echo "$BENCH_LOG" | rg -q 'gate_passed=True'; then
+if echo "$BENCH_LOG" | rg -q 'gate_passed=(True|true)|"gate_passed": true'; then
   ok "ml benchmark gate"
 else
   fail "ml benchmark gate"
@@ -152,6 +152,16 @@ if test -x deploy/mtls/gen-certs.sh && test -f pkg/httpauth/clientcert.go; then
   ok "mtls assets"
 else
   fail "mtls assets"
+fi
+if test -f docs/product/MAIL_EXTENSION.md && test -f apps/macos/project.yml; then
+  ok "macOS mail extension scaffold"
+else
+  fail "macOS mail extension scaffold"
+fi
+if test -f ml/locale_utils.py; then
+  ok "per-locale ML utils"
+else
+  fail "per-locale ML utils"
 fi
 if test -f deploy/grafana/provisioning/datasources/prometheus.yml; then
   ok "grafana provisioning"

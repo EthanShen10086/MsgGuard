@@ -3,3 +3,10 @@ fpr_max: 0.02
 fnr_max: 0.15
 adversarial_fpr_max: 0.05
 latency_p99_ms: 15
+locales:
+  zh-Hans:
+    f1_min: 0.80
+    fpr_max: 0.03
+  en-US:
+    f1_min: 0.90
+    fpr_max: 0.02

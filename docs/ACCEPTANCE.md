@@ -79,3 +79,8 @@
 - [x] CallDirectory extension skeleton + Settings guidance
 - [x] cert-manager Helm Certificate templates (prod values)
 - [x] flywheel worker binary removed from git + .gitignore
+
+## Phase 2.7 — Per-locale ML + macOS Mail
+- [x] `make train-all-locales` / `export-all-locales` + per-locale benchmark gates
+- [x] iOS Bayes/CoreML per-locale OTA paths + model service `bayes_url`
+- [x] macOS MailKit extension (`apps/macos/MailExtension`)

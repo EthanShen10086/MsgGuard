@@ -57,8 +57,10 @@ func (s *server) latest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("ETag", meta.Checksum)
 	json.NewEncoder(w).Encode(map[string]any{
 		"version": meta.Version, "locale": meta.Locale,
-		"checksum": meta.Checksum, "url": "/api/v1/models/" + meta.Version + "/download/spam_classifier.mlmodel",
-		"minIOS": "17.0",
+		"checksum": meta.Checksum,
+		"url":      "/api/v1/models/" + meta.Version + "/download/spam_classifier.mlmodel",
+		"bayes_url": "/api/v1/models/" + meta.Version + "/download/bayes_model.json",
+		"minIOS":   "17.0",
 	})
 }
 
@@ -93,6 +95,15 @@ func (s *server) download(w http.ResponseWriter, r *http.Request) {
 	}
 	version, name := parts[0], parts[2]
 	data, err := s.registry.GetArtifact(r.Context(), version, name)
+	if err != nil || data == nil {
+		for _, loc := range []string{"zh-Hans", "en-US"} {
+			fallback := filepath.Join(s.dir, loc, version, name)
+			data, err = os.ReadFile(fallback)
+			if err == nil {
+				break
+			}
+		}
+	}
 	if err != nil || data == nil {
 		fallback := filepath.Join(s.dir, "..", "..", "ml", "output", name)
 		data, err = os.ReadFile(fallback)

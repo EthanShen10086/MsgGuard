@@ -7,7 +7,9 @@ import joblib
 
 ROOT = Path(__file__).parent.parent
 BENCH = ROOT / "datasets" / "benchmark" / "test_zh.jsonl"
-PIPE = ROOT / "output" / "bayes_pipeline.joblib"
+PIPE = ROOT / "output" / "zh-Hans" / "bayes_pipeline.joblib"
+if not PIPE.exists():
+    PIPE = ROOT / "output" / "bayes_pipeline.joblib"
 SPAM_WORDS = ["免费", "中奖", "贷款", "free", "winner", "click"]
 
 

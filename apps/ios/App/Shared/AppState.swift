@@ -26,7 +26,7 @@ final class AppState {
         do {
             filterConfig = try await store.loadConfig()
             stats = try await store.loadStats()
-            if let modelData = try await store.loadBayesModel() {
+            if let modelData = try await store.loadBayesModel(locale: filterConfig.locale) {
                 engine.loadBayesModel(from: modelData)
             }
             if let url = try? await store.coreMLCompiledURL(locale: filterConfig.locale),
@@ -45,7 +45,7 @@ final class AppState {
                 await CloudSyncService.shared.pushConfig(filterConfig)
             }
             if let modelData = engine.exportBayesModel() {
-                try await store.saveBayesModel(modelData)
+                try await store.saveBayesModel(modelData, locale: filterConfig.locale)
             }
             AnalyticsManager.shared.track(.settingsChanged(key: "config", value: "saved"))
         } catch {
@@ -57,7 +57,7 @@ final class AppState {
         engine.trainSample(text: text, category: label)
         samples.insert(SampleEntry(text: text, label: label), at: 0)
         if let modelData = engine.exportBayesModel() {
-            try? await store.saveBayesModel(modelData)
+            try? await store.saveBayesModel(modelData, locale: filterConfig.locale)
         }
         AnalyticsManager.shared.track(.sampleSubmitted(label: label.rawValue))
     }

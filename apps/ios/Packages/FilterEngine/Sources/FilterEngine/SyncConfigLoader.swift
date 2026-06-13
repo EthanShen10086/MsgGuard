@@ -12,7 +12,9 @@ public enum SyncConfigLoader {
     }
 
     public static func loadBayesModel(appGroupID: String = AppConstants.appGroupID) -> Data? {
-        guard let url = containerURL(appGroupID)?.appendingPathComponent(AppConstants.AppGroupFiles.bayesModel) else {
+        let config = loadConfig(appGroupID: appGroupID)
+        let safe = config.locale.replacingOccurrences(of: "/", with: "_")
+        guard let url = containerURL(appGroupID)?.appendingPathComponent("bayes_\(safe).json") else {
             return nil
         }
         return try? Data(contentsOf: url)

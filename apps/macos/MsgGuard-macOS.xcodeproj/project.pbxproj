@@ -1,0 +1,344 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0425DA451EB75EF3D4B6639D /* MailExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A065F705007B6A129F51499 /* MailExtensionHandler.swift */; };
+		83541D233115E2F4ECDF7DBA /* FilterEngine in Frameworks */ = {isa = PBXBuildFile; productRef = ECA1BB3D444DEA6208C93033 /* FilterEngine */; };
+		DB970EE0B15D6B671C94191B /* SharedModels in Frameworks */ = {isa = PBXBuildFile; productRef = A29CD371B16E35FE9CF09BEB /* SharedModels */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1CE98E3A0C69982AD3CC5B86 /* MailExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MailExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A065F705007B6A129F51499 /* MailExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailExtensionHandler.swift; sourceTree = "<group>"; };
+		ACA78087486C777A784D2B4B /* SharedModels */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SharedModels; path = ../ios/Packages/SharedModels; sourceTree = SOURCE_ROOT; };
+		F6071B0F7F121892E85B736B /* MailExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MailExtension.entitlements; sourceTree = "<group>"; };
+		F8009DD59C0DD4D366935092 /* FilterEngine */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FilterEngine; path = ../ios/Packages/FilterEngine; sourceTree = SOURCE_ROOT; };
+		F88B281F57B6299CA6453FD0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8A564A88B8032F5E5388FD19 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB970EE0B15D6B671C94191B /* SharedModels in Frameworks */,
+				83541D233115E2F4ECDF7DBA /* FilterEngine in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		07CE3E1076D2F94A055CC0DC /* MailExtension */ = {
+			isa = PBXGroup;
+			children = (
+				F88B281F57B6299CA6453FD0 /* Info.plist */,
+				F6071B0F7F121892E85B736B /* MailExtension.entitlements */,
+				9A065F705007B6A129F51499 /* MailExtensionHandler.swift */,
+			);
+			path = MailExtension;
+			sourceTree = "<group>";
+		};
+		2F14B1D45711924F4FB8556D /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				F8009DD59C0DD4D366935092 /* FilterEngine */,
+				ACA78087486C777A784D2B4B /* SharedModels */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		7C61F6C116829D03E060B2E3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CE98E3A0C69982AD3CC5B86 /* MailExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D3508DB7E60CE6D577887304 = {
+			isa = PBXGroup;
+			children = (
+				07CE3E1076D2F94A055CC0DC /* MailExtension */,
+				2F14B1D45711924F4FB8556D /* Packages */,
+				7C61F6C116829D03E060B2E3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D320CF5E9386E89265F5BD0F /* MailExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 18B10FADE4BD440947BF5AD3 /* Build configuration list for PBXNativeTarget "MailExtension" */;
+			buildPhases = (
+				05BC97F2B5F2DA3994289254 /* Sources */,
+				8A564A88B8032F5E5388FD19 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MailExtension;
+			packageProductDependencies = (
+				A29CD371B16E35FE9CF09BEB /* SharedModels */,
+				ECA1BB3D444DEA6208C93033 /* FilterEngine */,
+			);
+			productName = MailExtension;
+			productReference = 1CE98E3A0C69982AD3CC5B86 /* MailExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		056C7864A083675BBE499BCF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					D320CF5E9386E89265F5BD0F = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 48959A6A57EAB4174511C6AF /* Build configuration list for PBXProject "MsgGuard-macOS" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = D3508DB7E60CE6D577887304;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				52976B451E5163E52F142C87 /* XCLocalSwiftPackageReference "../ios/Packages/FilterEngine" */,
+				327150CFF68794D12CD1CAB1 /* XCLocalSwiftPackageReference "../ios/Packages/SharedModels" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7C61F6C116829D03E060B2E3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D320CF5E9386E89265F5BD0F /* MailExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		05BC97F2B5F2DA3994289254 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0425DA451EB75EF3D4B6639D /* MailExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		86EB2CFEB2A11A7EC5F131AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		933FDBC549ABB7B686270586 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MailExtension/MailExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = MailExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mail;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B0B8BF0EEC37C1AED8A139DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D477B1050D29460C35A2C8EF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MailExtension/MailExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = MailExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethanshen.msgguard.mail;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		18B10FADE4BD440947BF5AD3 /* Build configuration list for PBXNativeTarget "MailExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				933FDBC549ABB7B686270586 /* Debug */,
+				D477B1050D29460C35A2C8EF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		48959A6A57EAB4174511C6AF /* Build configuration list for PBXProject "MsgGuard-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				86EB2CFEB2A11A7EC5F131AE /* Debug */,
+				B0B8BF0EEC37C1AED8A139DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		327150CFF68794D12CD1CAB1 /* XCLocalSwiftPackageReference "../ios/Packages/SharedModels" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../ios/Packages/SharedModels;
+		};
+		52976B451E5163E52F142C87 /* XCLocalSwiftPackageReference "../ios/Packages/FilterEngine" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../ios/Packages/FilterEngine;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A29CD371B16E35FE9CF09BEB /* SharedModels */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedModels;
+		};
+		ECA1BB3D444DEA6208C93033 /* FilterEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FilterEngine;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 056C7864A083675BBE499BCF /* Project object */;
+}

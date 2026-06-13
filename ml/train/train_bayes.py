@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Train Naive Bayes from processed data."""
+"""Train Naive Bayes from processed data (optionally per locale)."""
+import argparse
 import json
+import sys
 from pathlib import Path
+from typing import Optional
 
 import joblib
 import pandas as pd
@@ -12,23 +15,36 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
 ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(ROOT))
+from locale_utils import data_locales_for, normalize_locale, output_dir  # noqa: E402
+
 DATA = ROOT / "data" / "processed" / "train.csv"
 FALLBACK = ROOT / "data" / "processed" / "all.csv"
-OUTPUT = ROOT / "output"
-OUTPUT.mkdir(exist_ok=True)
 
 
-def load_data():
+def load_data(locale: Optional[str]) -> pd.DataFrame:
     path = DATA if DATA.exists() else FALLBACK
     if not path.exists():
         raise SystemExit("Run: make data")
     df = pd.read_csv(path)
+    if locale and "locale" in df.columns:
+        allowed = set(data_locales_for(locale))
+        df = df[df["locale"].isin(allowed)]
+        if df.empty:
+            raise SystemExit(f"No training rows for locale {locale}")
     df["label"] = df["label"].apply(lambda x: "spam" if x in ("spam", "phishing", "promotion") else "ham")
     return df
 
 
 def main():
-    df = load_data()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--locale", default=None, help="BCP-47 tag e.g. zh-Hans")
+    args = parser.parse_args()
+    tag = normalize_locale(args.locale) if args.locale else None
+    df = load_data(tag)
+    out = output_dir(ROOT, tag) if tag else ROOT / "output"
+    out.mkdir(parents=True, exist_ok=True)
+
     X_train, X_test, y_train, y_test = train_test_split(
         df["text"], df["label"], test_size=0.2, random_state=42, stratify=df["label"]
     )
@@ -40,10 +56,10 @@ def main():
     preds = pipe.predict(X_test)
     f1 = f1_score(y_test, preds, pos_label="spam")
     report = classification_report(y_test, preds, output_dict=True)
-    metrics = {"f1": f1, "report": report}
-    joblib.dump(pipe, OUTPUT / "bayes_pipeline.joblib")
-    (OUTPUT / "bayes_metrics.json").write_text(json.dumps(metrics, indent=2))
-    print(json.dumps({"f1": round(f1, 4)}, indent=2))
+    metrics = {"f1": f1, "report": report, "locale": tag or "all", "rows": len(df)}
+    joblib.dump(pipe, out / "bayes_pipeline.joblib")
+    (out / "bayes_metrics.json").write_text(json.dumps(metrics, indent=2))
+    print(json.dumps({"locale": tag or "all", "f1": round(f1, 4), "rows": len(df)}, indent=2))
 
 
 if __name__ == "__main__":

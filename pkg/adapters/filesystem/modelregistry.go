@@ -46,6 +46,12 @@ func (r *ModelRegistry) GetLatest(ctx context.Context, locale string) (*ports.Mo
 }
 
 func (r *ModelRegistry) GetArtifact(ctx context.Context, version, name string) ([]byte, error) {
+	for locale := range r.meta {
+		path := filepath.Join(r.dir, locale, version, name)
+		if data, err := os.ReadFile(path); err == nil {
+			return data, nil
+		}
+	}
 	path := filepath.Join(r.dir, version, name)
 	return os.ReadFile(path)
 }

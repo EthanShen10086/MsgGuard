@@ -1,0 +1,42 @@
+name: MsgGuard-macOS
+options:
+  bundleIdPrefix: com.ethanshen.msgguard
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+
+packages:
+  SharedModels:
+    path: ../ios/Packages/SharedModels
+  FilterEngine:
+    path: ../ios/Packages/FilterEngine
+
+targets:
+  MailExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: MailExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ethanshen.msgguard.mail
+        INFOPLIST_FILE: MailExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: MailExtension/MailExtension.entitlements
+        CODE_SIGN_STYLE: Automatic
+    dependencies:
+      - package: SharedModels
+      - package: FilterEngine
+    entitlements:
+      path: MailExtension/MailExtension.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.application-groups:
+          - group.com.ethanshen.msgguard
+
+schemes:
+  MailExtension:
+    build:
+      targets:
+        MailExtension: all
+    run:
+      config: Debug
