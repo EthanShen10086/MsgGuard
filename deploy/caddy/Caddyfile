@@ -1,11 +1,10 @@
-api.msgguard.app {
-    encode gzip
-    reverse_proxy localhost:8080
+msgguard.app, www.msgguard.app {
+	encode gzip
+	root * /var/www/msgguard
+	file_server
 }
 
-msgguard.app, www.msgguard.app {
-    encode gzip
-    root * /var/www/msgguard
-    file_server
-    try_files {path} /privacy/index.html
+api.msgguard.app {
+	encode gzip
+	reverse_proxy localhost:8080
 }

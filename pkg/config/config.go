@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Features      Features      `yaml:"features"`
+	Security      Security      `yaml:"security"`
 	Gateway       Gateway       `yaml:"gateway"`
 	Database      Database      `yaml:"database"`
 	Cache         Cache         `yaml:"cache"`
@@ -34,9 +35,14 @@ type ModelStorage struct {
 }
 
 type Features struct {
-	CloudLLM            bool `yaml:"cloud_llm"`
-	CrashReportUpload   bool `yaml:"crash_report_upload"`
-	IPWhitelistEnabled  bool `yaml:"ip_whitelist_enabled"`
+	CloudLLM           bool `yaml:"cloud_llm"`
+	CrashReportUpload  bool `yaml:"crash_report_upload"`
+	IPWhitelistEnabled bool `yaml:"ip_whitelist_enabled"`
+}
+
+type Security struct {
+	MTLSAdminRequired bool   `yaml:"mtls_admin_required"`
+	MTLSClientHeader  string `yaml:"mtls_client_header"`
 }
 
 type Gateway struct {

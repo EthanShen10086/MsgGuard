@@ -54,3 +54,10 @@
 - [x] Helm `values-mongodb.yaml` + `DATABASE_DRIVER` in ConfigMap
 - [x] `make tier3-mongodb` / `deploy/tiers/tier3-helm-mongodb.sh`
 - [x] Cookbook 32
+
+## Phase 2.4 — Support + mTLS
+- [x] `deploy/site/support/index.html` + `docs/legal/SUPPORT.md`
+- [x] `deploy/mtls/gen-certs.sh` + Caddy mTLS + `docker-compose.mtls.yml`
+- [x] Gateway `MTLS_ADMIN_REQUIRED` middleware (`pkg/httpauth/clientcert.go`)
+- [x] Helm `values-mtls.yaml` + ingress client-auth annotations
+- [x] `make tier4-mtls` / Cookbook 33

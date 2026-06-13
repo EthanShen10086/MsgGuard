@@ -5,6 +5,7 @@
 - [x] docker-compose single VPS
 - [x] App Store metadata draft (`docs/app-store/metadata.md`)
 - [x] Privacy policy (`docs/legal/PRIVACY.md` + `deploy/site/privacy/`)
+- [x] Support page (`docs/legal/SUPPORT.md` + `deploy/site/support/`)
 
 ## Growth (Tier 2–3)
 - [x] PostgreSQL + Redis wired (via Container config)
@@ -15,7 +16,7 @@
 
 ## Enterprise (Tier 4)
 - [x] Multi-replica HPA (Helm template)
-- [ ] mTLS (optional)
+- [x] mTLS (Caddy + gateway admin middleware, Helm values-mtls)
 - [x] Cross-region backup script (`deploy/ops/backup.sh`)
 - [x] Audit logging (voxera-kit audit on feedback)
 - [x] A/B experiment via featureflag (admin service)

@@ -23,6 +23,7 @@ import (
 	"github.com/EthanShen10086/voxera-kit/security/headers"
 
 	mgapp "github.com/EthanShen10086/msgguard/pkg/app"
+	"github.com/EthanShen10086/msgguard/pkg/httpauth"
 	"github.com/EthanShen10086/msgguard/services/gateway/internal/handler"
 )
 
@@ -107,6 +108,16 @@ func Run(c *mgapp.Container) error {
 	if c.Tracer != nil {
 		mws = append([]kitmw.Func{kitmw.Tracing(c.Tracer)}, mws...)
 	}
+	if mtlsAdminRequired(c) {
+		prefixes := []string{"/api/v1/admin/"}
+		if h := mtlsClientHeader(c); h != "" {
+			mws = append(mws, httpauth.RequireClientCertHeader(h, prefixes))
+			c.Log.Info("mtls admin header enforcement enabled", logger.Field{Key: "header", Value: h})
+		} else {
+			mws = append(mws, httpauth.RequireClientCert(prefixes))
+			c.Log.Info("mtls admin TLS cert enforcement enabled")
+		}
+	}
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Config.Gateway.Port),
@@ -145,6 +156,20 @@ func proxyTo(addr string) http.Handler {
 		panic(err)
 	}
 	return httputil.NewSingleHostReverseProxy(target)
+}
+
+func mtlsAdminRequired(c *mgapp.Container) bool {
+	if os.Getenv("MTLS_ADMIN_REQUIRED") == "true" {
+		return true
+	}
+	return c.Config.Security.MTLSAdminRequired
+}
+
+func mtlsClientHeader(c *mgapp.Container) string {
+	if h := os.Getenv("MTLS_CLIENT_HEADER"); h != "" {
+		return h
+	}
+	return c.Config.Security.MTLSClientHeader
 }
 
 func rateLimit(c *mgapp.Container) kitmw.Func {

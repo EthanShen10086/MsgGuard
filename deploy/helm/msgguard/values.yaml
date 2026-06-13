@@ -7,6 +7,10 @@ service:
 ingress:
   enabled: true
   host: api.msgguard.app
+  mtls:
+    enabled: false
+    secretName: msgguard-mtls-ca
+    authSecret: nginx.org/mtls-ca-secret
 resources:
   requests:
     cpu: 100m
@@ -23,5 +27,8 @@ auth:
   secret: ""
 redis:
   url: ""
+security:
+  mtlsAdminRequired: false
+  mtlsClientHeader: ""
 config:
   cloudLLM: false

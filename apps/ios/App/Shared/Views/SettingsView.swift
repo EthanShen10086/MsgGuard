@@ -58,6 +58,7 @@ struct SettingsView: View {
                     }
                 }
                 Section {
+                    Link(String(localized: "settings.support"), destination: URL(string: "https://msgguard.app/support")!)
                     Link(String(localized: "settings.privacyPolicy"), destination: URL(string: "https://msgguard.app/privacy")!)
                 }
             }

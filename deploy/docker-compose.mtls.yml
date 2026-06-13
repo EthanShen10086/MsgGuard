@@ -1,0 +1,17 @@
+# Overlay: Caddy mTLS reverse proxy in front of gateway
+services:
+  gateway:
+    environment:
+      MTLS_ADMIN_REQUIRED: "true"
+      MTLS_CLIENT_HEADER: "X-Client-Cert-Subject"
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "8443:8443"
+      - "8088:8088"
+    volumes:
+      - ./caddy/Caddyfile.mtls:/etc/caddy/Caddyfile:ro
+      - ./mtls/certs:/etc/caddy/mtls:ro
+      - ./site:/var/www/msgguard:ro
+    depends_on:
+      - gateway

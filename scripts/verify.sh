@@ -132,6 +132,23 @@ else
   fail "app store metadata draft"
 fi
 
+echo "=== Support + mTLS ==="
+if test -f docs/legal/SUPPORT.md && test -f deploy/site/support/index.html; then
+  ok "support page"
+else
+  fail "support page"
+fi
+if test -x deploy/mtls/gen-certs.sh && test -f pkg/httpauth/clientcert.go; then
+  ok "mtls assets"
+else
+  fail "mtls assets"
+fi
+if (cd pkg/httpauth && go test ./...); then
+  ok "httpauth mTLS tests"
+else
+  fail "httpauth mTLS tests"
+fi
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 if [[ "$FAIL" -gt 0 ]]; then

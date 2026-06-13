@@ -36,6 +36,7 @@
 "settings.proActive" = "Pro 已激活";
 "settings.upgradePro" = "升级 Pro";
 "settings.privacyPolicy" = "隐私政策";
+"settings.support" = "帮助与支持";
 "settings.cloudLLMProHint" = "需要 Pro 订阅";
 "samples.feed" = "投喂样本";
 "samples.paste" = "粘贴短信内容";

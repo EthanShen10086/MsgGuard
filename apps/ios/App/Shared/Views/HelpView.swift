@@ -17,6 +17,7 @@ struct HelpView: View {
                     NavigationLink(String(localized: "help.feedback.submit")) {
                         FeedbackView()
                     }
+                    Link(String(localized: "settings.support"), destination: URL(string: "https://msgguard.app/support")!)
                 }
             }
             .navigationTitle(String(localized: "tab.help"))

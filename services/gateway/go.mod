@@ -5,6 +5,7 @@ go 1.25.0
 require (
 	github.com/EthanShen10086/msgguard/pkg/app v0.0.0
 	github.com/EthanShen10086/msgguard/pkg/config v0.0.0
+	github.com/EthanShen10086/msgguard/pkg/httpauth v0.0.0
 	github.com/EthanShen10086/msgguard/pkg/ports v0.0.0
 	github.com/EthanShen10086/voxera-kit/audit v0.0.0
 	github.com/EthanShen10086/voxera-kit/auth v0.0.0
@@ -20,6 +21,7 @@ require (
 replace (
 	github.com/EthanShen10086/msgguard/pkg/app => ../../pkg/app
 	github.com/EthanShen10086/msgguard/pkg/config => ../../pkg/config
+	github.com/EthanShen10086/msgguard/pkg/httpauth => ../../pkg/httpauth
 	github.com/EthanShen10086/msgguard/pkg/ports => ../../pkg/ports
 	github.com/EthanShen10086/voxera-kit/audit => ../../../voxera-kit/backend/audit
 	github.com/EthanShen10086/voxera-kit/auth => ../../../voxera-kit/backend/auth

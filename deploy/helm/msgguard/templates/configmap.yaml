@@ -8,3 +8,5 @@ data:
   DATABASE_DSN: {{ .Values.database.dsn | quote }}
   AUTH_SECRET: {{ .Values.auth.secret | quote }}
   REDIS_URL: {{ .Values.redis.url | quote }}
+  MTLS_ADMIN_REQUIRED: {{ .Values.security.mtlsAdminRequired | default false | quote }}
+  MTLS_CLIENT_HEADER: {{ .Values.security.mtlsClientHeader | default "" | quote }}

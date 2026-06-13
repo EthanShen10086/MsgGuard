@@ -1,0 +1,25 @@
+# Caddy with mTLS for api.msgguard.app (dev / Tier 4)
+# Requires: bash deploy/mtls/gen-certs.sh
+
+{
+	admin off
+}
+
+https://localhost:8443 {
+	tls /etc/caddy/mtls/server.crt /etc/caddy/mtls/server.key {
+		client_auth {
+			mode require_and_verify
+			trusted_ca_cert_file /etc/caddy/mtls/ca.crt
+		}
+	}
+	encode gzip
+	reverse_proxy gateway:8080 {
+		header_up X-Client-Cert-Subject {http.request.tls.client.subject}
+	}
+}
+
+msgguard.app, www.msgguard.app, :8088 {
+	encode gzip
+	root * /var/www/msgguard
+	file_server
+}

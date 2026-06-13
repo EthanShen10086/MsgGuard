@@ -1,0 +1,14 @@
+replicaCount: 3
+ingress:
+  host: api.msgguard.app
+  mtls:
+    enabled: true
+    secretName: msgguard-mtls-ca
+    authSecret: nginx.org/mtls-ca-secret
+security:
+  mtlsAdminRequired: true
+  mtlsClientHeader: "X-Client-Cert-Subject"
+auth:
+  secret: "CHANGE_ME_PROD"
+config:
+  cloudLLM: true
