@@ -13,7 +13,12 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           for pkg in SharedModels DesignSystem FilterEngine BlocklistStore; do
-            cd apps/ios/Packages/$pkg && swift test
+            cd "apps/ios/Packages/$pkg"
+            if [ -d Tests ] && find Tests -name '*.swift' -print -quit | grep -q .; then
+              swift test
+            else
+              swift build
+            fi
           done
 
   macos-mail:
@@ -21,8 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          cd apps/macos && xcodegen generate
-          xcodebuild -scheme MsgGuardMailHost -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
+          xcodebuild -project apps/macos/MsgGuard-macOS.xcodeproj -scheme MsgGuardMailHost -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
 
   go-gateway:
     runs-on: ubuntu-latest
@@ -48,8 +52,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: azure/setup-helm@v4
       - run: |
-          helm template msgguard deploy/helm/msgguard | rg -q Deployment
-          helm template msgguard deploy/helm/msgguard -f deploy/helm/msgguard/values-mongodb.yaml | rg -q mongodb
+          helm template msgguard deploy/helm/msgguard | grep -q Deployment
+          helm template msgguard deploy/helm/msgguard -f deploy/helm/msgguard/values-mongodb.yaml | grep -q mongodb
 
   ml-benchmark:
     runs-on: ubuntu-latest

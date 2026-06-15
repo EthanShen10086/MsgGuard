@@ -1,10 +1,30 @@
 import SwiftUI
 import SharedModels
+#if canImport(UIKit)
+import UIKit
+#endif
+#if canImport(AppKit)
+import AppKit
+#endif
 
 public enum MGTheme {
     public static let accent = Color.accentColor
-    public static let background = Color(.systemGroupedBackground)
-    public static let cardBackground = Color(.secondarySystemGroupedBackground)
+
+    public static var background: Color {
+        #if os(iOS)
+        Color(uiColor: .systemGroupedBackground)
+        #else
+        Color(nsColor: .windowBackgroundColor)
+        #endif
+    }
+
+    public static var cardBackground: Color {
+        #if os(iOS)
+        Color(uiColor: .secondarySystemGroupedBackground)
+        #else
+        Color(nsColor: .controlBackgroundColor)
+        #endif
+    }
 }
 
 public struct MGCard<Content: View>: View {
