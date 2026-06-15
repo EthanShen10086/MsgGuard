@@ -13,12 +13,14 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           for pkg in SharedModels DesignSystem FilterEngine BlocklistStore; do
-            cd "apps/ios/Packages/$pkg"
-            if [ -d Tests ] && find Tests -name '*.swift' -print -quit | grep -q .; then
-              swift test
-            else
-              swift build
-            fi
+            (
+              cd "apps/ios/Packages/$pkg"
+              if [ -d Tests ] && find Tests -name '*.swift' -print -quit | grep -q .; then
+                swift test
+              else
+                swift build
+              fi
+            )
           done
 
   macos-mail:
