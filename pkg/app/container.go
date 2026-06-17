@@ -22,6 +22,7 @@ import (
 	"github.com/EthanShen10086/voxera-kit/ratelimiter"
 	rlMemory "github.com/EthanShen10086/voxera-kit/ratelimiter/memory"
 
+	appstoreadapter "github.com/EthanShen10086/msgguard/pkg/adapters/appstore"
 	fsadapter "github.com/EthanShen10086/msgguard/pkg/adapters/filesystem"
 	llmadapter "github.com/EthanShen10086/msgguard/pkg/adapters/llm"
 	memadapters "github.com/EthanShen10086/msgguard/pkg/adapters/memory"
@@ -29,6 +30,7 @@ import (
 	natsadapter "github.com/EthanShen10086/msgguard/pkg/adapters/nats"
 	pgadapters "github.com/EthanShen10086/msgguard/pkg/adapters/postgres"
 	redisadapters "github.com/EthanShen10086/msgguard/pkg/adapters/redis"
+	tiadapter "github.com/EthanShen10086/msgguard/pkg/adapters/threatintel"
 	"github.com/EthanShen10086/msgguard/pkg/config"
 	"github.com/EthanShen10086/msgguard/pkg/ports"
 )
@@ -43,6 +45,7 @@ type Container struct {
 	Cache           ports.Cache
 	Queue           ports.Queue
 	ModelRegistry   ports.ModelRegistry
+	ThreatIntel     ports.ThreatIntel
 	AnalyticsStore  ports.AnalyticsStore
 	LLMClassifier   ports.LLMClassifier
 	Authenticator   auth.Authenticator
@@ -50,9 +53,11 @@ type Container struct {
 	RateLimiter     ratelimiter.RateLimiter
 	CircuitBreaker  circuitbreaker.CircuitBreaker
 	AuditWriter     audit.Writer
-	QuotaStore      aiquota.Manager
-	FlagStore       featureflag.Store
-	LLMRouter       *llm.Router
+	QuotaStore        aiquota.Manager
+	FlagStore         featureflag.Store
+	SubscriptionStore ports.SubscriptionStore
+	AppStoreVerifier  *appstoreadapter.Verifier
+	LLMRouter         *llm.Router
 }
 
 func NewContainer(cfg *config.Config) (*Container, error) {
@@ -74,12 +79,22 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 
 	dsn := envOr("DATABASE_DSN", cfg.Database.DSN)
 	driver := envOr("DATABASE_DRIVER", cfg.Database.Driver)
+	if dsn != "" && (driver == "postgres" || driver == "") {
+		if err := pgadapters.Migrate(dsn); err != nil {
+			log.Info("postgres migration warning", logger.Field{Key: "error", Value: err.Error()})
+		} else {
+			log.Info("postgres migrations applied")
+		}
+	}
 	c.FeedbackStore = wireFeedbackStore(cfg, driver, dsn, log)
 	c.RuleStore = wireRuleStore(cfg, driver, dsn, log)
 	c.AnalyticsStore = wireAnalyticsStore(cfg, driver, dsn, log)
 	c.Cache = wireCache(cfg, log)
 	c.Queue = wireQueue(cfg, log)
 	c.ModelRegistry = wireModelRegistry(cfg, log)
+	c.ThreatIntel = wireThreatIntel(log)
+	c.SubscriptionStore = wireSubscriptionStore(driver, dsn, log)
+	c.AppStoreVerifier = appstoreadapter.NewVerifier()
 
 	c.LLMRouter = llm.NewRouter()
 	if os.Getenv("QWEN_API_KEY") != "" {
@@ -90,8 +105,15 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 	}
 	c.LLMClassifier = llmadapter.NewClassifier(c.LLMRouter)
 
-	secret := envOr("AUTH_SECRET", "msgguard-dev-secret")
-	memAuth := memadapters.NewAuth(secret)
+	secret := envOr("AUTH_SECRET", "")
+	allowDev := os.Getenv("MSGGUARD_ENV") != "production" && os.Getenv("MSGGUARD_ENV") != "prod"
+	if err := memadapters.ValidateSecret(secret, os.Getenv("MSGGUARD_ENV"), allowDev); err != nil && os.Getenv("CI") != "true" {
+		log.Info("auth secret warning", logger.Field{Key: "error", Value: err.Error()})
+	}
+	if secret == "" && allowDev {
+		secret = "msgguard-dev-secret"
+	}
+	memAuth := memadapters.NewAuthWithOptions(secret, allowDev)
 	c.Authenticator = memAuth
 	c.Authorizer = memAuth
 
@@ -109,10 +131,10 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 	})
 
 	c.AuditWriter = auditMemory.NewAdapter()
-	c.QuotaStore = aiquotaMemory.NewStore()
-	c.FlagStore = ffMemory.NewAdapter()
+	c.QuotaStore, c.FlagStore = wireQuotaAndFlags(driver, dsn, log)
 	_ = c.FlagStore.SetFlag(ctx, featureflag.Flag{Key: "cloud_llm", Enabled: cfg.Features.CloudLLM, Percentage: 100})
 	_ = c.FlagStore.SetFlag(ctx, featureflag.Flag{Key: "shadow_mode", Enabled: false, Percentage: 0})
+	_ = c.FlagStore.SetFlag(ctx, featureflag.Flag{Key: "model_canary", Enabled: false, Percentage: 0})
 
 	return c, nil
 }
@@ -198,6 +220,36 @@ func wireQueue(cfg *config.Config, log logger.Logger) ports.Queue {
 	return memadapters.NewQueue()
 }
 
+func wireSubscriptionStore(driver, dsn string, log logger.Logger) ports.SubscriptionStore {
+	if dsn != "" && driver == "mongodb" {
+		if s, err := mongoadapters.NewSubscriptionStore(dsn); err == nil {
+			log.Info("mongodb subscription store connected")
+			return s
+		}
+	}
+	if dsn != "" && (driver == "postgres" || driver == "") {
+		if s, err := pgadapters.NewSubscriptionStore(dsn); err == nil {
+			log.Info("postgres subscription store connected")
+			return s
+		}
+	}
+	return memadapters.NewSubscriptionStore()
+}
+
+func wireQuotaAndFlags(driver, dsn string, log logger.Logger) (aiquota.Manager, featureflag.Store) {
+	if dsn != "" && (driver == "postgres" || driver == "") {
+		if q, err := pgadapters.NewQuotaManager(dsn); err == nil {
+			log.Info("postgres quota whitelist connected")
+			if f, err := pgadapters.NewFlagStore(dsn); err == nil {
+				log.Info("postgres feature flags connected")
+				return q, f
+			}
+			return q, ffMemory.NewAdapter()
+		}
+	}
+	return aiquotaMemory.NewStore(), ffMemory.NewAdapter()
+}
+
 func wireModelRegistry(cfg *config.Config, log logger.Logger) ports.ModelRegistry {
 	path := cfg.ModelStorage.Path
 	if path == "" {
@@ -207,6 +259,14 @@ func wireModelRegistry(cfg *config.Config, log logger.Logger) ports.ModelRegistr
 		return reg
 	}
 	return memadapters.NewModelRegistry()
+}
+
+func wireThreatIntel(log logger.Logger) ports.ThreatIntel {
+	sb := tiadapter.NewSafeBrowsing()
+	if sb.Enabled() {
+		log.Info("safe browsing threat intel enabled (stub)")
+	}
+	return sb
 }
 
 func envOr(key, fallback string) string {

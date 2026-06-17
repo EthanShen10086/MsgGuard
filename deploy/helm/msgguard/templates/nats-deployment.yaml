@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-nats
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-nats
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-nats
+    spec:
+      containers:
+        - name: nats
+          image: "{{ .Values.nats.image }}"
+          ports:
+            - containerPort: 4222
+          args: ["-js", "-m", "8222"]
+          livenessProbe:
+            tcpSocket:
+              port: 4222
+          readinessProbe:
+            tcpSocket:
+              port: 4222

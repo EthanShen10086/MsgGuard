@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-flywheel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-flywheel
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-flywheel
+    spec:
+      containers:
+        - name: flywheel
+          image: "{{ .Values.flywheel.image.repository }}:{{ .Values.flywheel.image.tag }}"
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-config
+          env:
+            - name: NATS_URL
+              value: {{ .Values.nats.url | quote }}

@@ -1,4 +1,7 @@
 // Package main is the MsgGuard admin API for quota whitelist and feature flags.
+//
+// Deprecated: quota whitelist and feature flag routes are served by the gateway
+// at /api/v1/admin/quota/whitelist and /api/v1/admin/flags. Use services/gateway instead.
 package main
 
 import (

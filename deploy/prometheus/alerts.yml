@@ -8,10 +8,64 @@ groups:
           severity: critical
         annotations:
           summary: "MsgGuard gateway is down"
+          description: "Gateway scrape target has been down for 2+ minutes."
+
       - alert: HighErrorRate
-        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        expr: |
+          sum(rate(http_requests_total{job="msgguard-gateway",status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="msgguard-gateway"}[5m])) > 0.05
         for: 5m
         labels:
           severity: warning
         annotations:
           summary: "High 5xx error rate on gateway"
+          description: "More than 5% of gateway requests are 5xx over 5m."
+
+      - alert: HighLatencyP99
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job="msgguard-gateway"}[5m])) by (le)) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Gateway p99 latency above 2s"
+          description: "Check LLM circuit breaker and database connectivity."
+
+      - alert: RateLimitSpike
+        expr: increase(http_requests_total{job="msgguard-gateway",status="429"}[5m]) > 50
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "Elevated 429 rate limit responses"
+          description: "Possible abuse or misconfigured client retry storm."
+
+      - alert: ShadowDisagreeRateHigh
+        expr: |
+          (shadow_disagree_total / shadow_total) > 0.15
+          and shadow_total > 100
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Shadow mode disagree rate above 15%"
+          description: "Review /api/v1/admin/shadow/stats and consider pausing cloud_llm flag."
+
+      - alert: FlywheelQueueBacklog
+        expr: nats_consumer_num_pending{stream="flywheel"} > 1000
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Flywheel NATS consumer backlog"
+          description: "Retrain worker may be stalled; check flywheel pod logs."
+
+      - alert: SLOErrorBudgetBurn
+        expr: |
+          (1 - avg_over_time(up{job="msgguard-gateway"}[1h])) > 0.005
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "Gateway availability below 99.5% over 1h"
+          description: "SLO error budget burning; see docs/sre/SLO.md"

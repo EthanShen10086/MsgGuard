@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -20,18 +21,20 @@ import (
 )
 
 type ClassifyHandler struct {
-	classifier ports.LLMClassifier
-	breaker    circuitbreaker.CircuitBreaker
-	cache      ports.Cache
-	queue      ports.Queue
-	cfg        *config.Config
-	log        logger.Logger
-	quota      aiquota.Manager
-	flags      featureflag.Store
+	classifier   ports.LLMClassifier
+	threatIntel  ports.ThreatIntel
+	breaker      circuitbreaker.CircuitBreaker
+	cache        ports.Cache
+	queue        ports.Queue
+	cfg          *config.Config
+	log          logger.Logger
+	quota        aiquota.Manager
+	flags        featureflag.Store
 }
 
 func NewClassifyHandler(
 	classifier ports.LLMClassifier,
+	threatIntel ports.ThreatIntel,
 	breaker circuitbreaker.CircuitBreaker,
 	cache ports.Cache,
 	cfg *config.Config,
@@ -41,8 +44,8 @@ func NewClassifyHandler(
 	flags featureflag.Store,
 ) *ClassifyHandler {
 	return &ClassifyHandler{
-		classifier: classifier, breaker: breaker, cache: cache, queue: queue,
-		cfg: cfg, log: log, quota: quota, flags: flags,
+		classifier: classifier, threatIntel: threatIntel, breaker: breaker,
+		cache: cache, queue: queue, cfg: cfg, log: log, quota: quota, flags: flags,
 	}
 }
 
@@ -99,6 +102,10 @@ func (h *ClassifyHandler) run(r *http.Request) (classifyResponse, error) {
 }
 
 func (h *ClassifyHandler) runInternal(r *http.Request, req classifyRequest) (classifyResponse, error) {
+	if resp, ok := h.threatIntelCheck(r.Context(), req.Body); ok {
+		return resp, nil
+	}
+
 	if h.cache != nil {
 		key := cacheKey(req.Body)
 		if cached, err := h.cache.Get(r.Context(), key); err == nil && cached != nil {
@@ -219,6 +226,42 @@ func heuristicClassify(text string) classifyResponse {
 		return classifyResponse{Action: "promotion", Category: "promotion", Confidence: 0.75}
 	}
 	return classifyResponse{Action: "allow", Category: "ham", Confidence: 0.6}
+}
+
+var urlPattern = regexp.MustCompile(`https?://[^\s<>"']+`)
+
+func (h *ClassifyHandler) threatIntelCheck(ctx context.Context, body string) (classifyResponse, bool) {
+	if h.threatIntel == nil {
+		return classifyResponse{}, false
+	}
+	for _, raw := range extractURLs(body) {
+		verdict, err := h.threatIntel.CheckURL(ctx, raw)
+		if err != nil || verdict == nil {
+			continue
+		}
+		if verdict.Malicious {
+			return classifyResponse{Action: "junk", Category: "phishing", Confidence: 0.99}, true
+		}
+	}
+	return classifyResponse{}, false
+}
+
+func extractURLs(text string) []string {
+	matches := urlPattern.FindAllString(text, -1)
+	if len(matches) == 0 {
+		return nil
+	}
+	seen := map[string]struct{}{}
+	var out []string
+	for _, m := range matches {
+		m = strings.TrimRight(m, ".,;:!?)")
+		if _, ok := seen[m]; ok {
+			continue
+		}
+		seen[m] = struct{}{}
+		out = append(out, m)
+	}
+	return out
 }
 
 func writeJSON(w http.ResponseWriter, v any) {

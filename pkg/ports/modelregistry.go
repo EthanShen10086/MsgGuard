@@ -21,3 +21,8 @@ type ModelRegistry interface {
 	GetLatest(ctx context.Context, locale string) (*ModelMeta, error)
 	GetArtifact(ctx context.Context, version, name string) ([]byte, error)
 }
+
+// ModelRollback is implemented by registries that keep version history per locale.
+type ModelRollback interface {
+	Rollback(ctx context.Context, locale, targetVersion string) (*ModelMeta, error)
+}

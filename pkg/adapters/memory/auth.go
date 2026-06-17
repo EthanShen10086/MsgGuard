@@ -9,16 +9,18 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/EthanShen10086/voxera-kit/auth"
 )
 
 var rolePermissions = map[string][]string{
-	"admin":       {"models:write", "feedback:read", "admin:read", "quota:write"},
-	"ml_engineer": {"models:write", "feedback:read"},
-	"pro":         {"analytics:write"},
-	"user":        {"analytics:write"},
+	"admin":       {"models:write", "models:read", "feedback:read", "admin:read", "quota:write", "rules:write", "analytics:write"},
+	"ml_engineer": {"models:write", "models:read", "feedback:read", "rules:write"},
+	"device":      {"models:read", "analytics:write", "feedback:write"},
+	"pro":         {"analytics:write", "models:read"},
+	"user":        {"analytics:write", "models:read"},
 }
 
 type tokenPayload struct {
@@ -29,14 +31,39 @@ type tokenPayload struct {
 
 // Auth implements Authenticator + Authorizer with HMAC tokens (dev/production bootstrap).
 type Auth struct {
-	secret string
+	secret   string
+	revoked  map[string]struct{}
+	allowDev bool
+	mu       sync.RWMutex
 }
 
+// NewAuth creates an auth service. allowDevSecret permits the default dev secret when true.
 func NewAuth(secret string) *Auth {
+	return NewAuthWithOptions(secret, true)
+}
+
+// NewAuthWithOptions creates auth with explicit dev-secret policy.
+func NewAuthWithOptions(secret string, allowDevSecret bool) *Auth {
 	if secret == "" {
-		secret = "msgguard-dev-secret"
+		if allowDevSecret {
+			secret = "msgguard-dev-secret"
+		}
 	}
-	return &Auth{secret: secret}
+	return &Auth{secret: secret, revoked: map[string]struct{}{}, allowDev: allowDevSecret}
+}
+
+// ValidateSecret returns an error if the secret is missing or insecure in production mode.
+func ValidateSecret(secret string, env string, allowDev bool) error {
+	if secret == "" {
+		if allowDev && env != "production" {
+			return nil
+		}
+		return errors.New("AUTH_SECRET is required")
+	}
+	if env == "production" && (secret == "msgguard-dev-secret" || len(secret) < 32) {
+		return errors.New("AUTH_SECRET must be at least 32 chars in production")
+	}
+	return nil
 }
 
 func (a *Auth) Authenticate(ctx context.Context, token string) (*auth.Claims, error) {
@@ -57,6 +84,9 @@ func (a *Auth) Authenticate(ctx context.Context, token string) (*auth.Claims, er
 	mac.Write(payloadBytes)
 	if !hmac.Equal(sig, mac.Sum(nil)) {
 		return nil, errors.New("invalid signature")
+	}
+	if _, revoked := a.isRevoked(token); revoked {
+		return nil, errors.New("token revoked")
 	}
 	var p tokenPayload
 	if err := json.Unmarshal(payloadBytes, &p); err != nil {
@@ -98,11 +128,29 @@ func (a *Auth) GenerateToken(ctx context.Context, claims *auth.Claims) (*auth.To
 }
 
 func (a *Auth) RefreshToken(ctx context.Context, refreshToken string) (*auth.TokenPair, error) {
-	return a.GenerateToken(ctx, nil)
+	claims, err := a.Authenticate(ctx, refreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return a.GenerateToken(ctx, &auth.Claims{
+		UserID: claims.UserID, Roles: claims.Roles,
+		ExpiresAt: time.Now().Add(24 * time.Hour),
+	})
 }
 
 func (a *Auth) RevokeToken(ctx context.Context, token string) error {
+	token = strings.TrimPrefix(token, "Bearer ")
+	a.mu.Lock()
+	a.revoked[token] = struct{}{}
+	a.mu.Unlock()
 	return nil
+}
+
+func (a *Auth) isRevoked(token string) (string, bool) {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	_, ok := a.revoked[token]
+	return token, ok
 }
 
 func (a *Auth) Authorize(ctx context.Context, claims *auth.Claims, resource, action string) (bool, error) {

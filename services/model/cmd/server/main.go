@@ -23,12 +23,17 @@ func main() {
 		panic(err)
 	}
 	auth := memadapters.NewAuth(envOr("AUTH_SECRET", "msgguard-dev-secret"))
+	modelAuth := os.Getenv("MODEL_DOWNLOAD_AUTH_REQUIRED") == "true"
 	srv := &server{registry: reg, dir: dir}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("ok")) })
 	mux.HandleFunc("/api/v1/models/latest", srv.latest)
 	mux.HandleFunc("/api/v1/models/register", httpauth.RequirePermission(auth, auth, "models", "write", srv.register))
-	mux.HandleFunc("/api/v1/models/", srv.download)
+	if modelAuth {
+		mux.HandleFunc("/api/v1/models/", httpauth.RequireModelRead(auth, auth, srv.route))
+	} else {
+		mux.HandleFunc("/api/v1/models/", srv.route)
+	}
 	port := envOr("PORT", "8083")
 	http.ListenAndServe(":"+port, mux)
 }
@@ -37,6 +42,18 @@ type server struct {
 	registry ports.ModelRegistry
 	dir      string
 	mu       sync.Mutex
+}
+
+func (s *server) route(w http.ResponseWriter, r *http.Request) {
+	if strings.HasSuffix(r.URL.Path, "/latest") || r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+	if strings.Contains(r.URL.Path, "/download/") {
+		s.download(w, r)
+		return
+	}
+	http.NotFound(w, r)
 }
 
 func (s *server) latest(w http.ResponseWriter, r *http.Request) {

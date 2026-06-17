@@ -3,10 +3,19 @@ fpr_max: 0.02
 fnr_max: 0.15
 adversarial_fpr_max: 0.05
 latency_p99_ms: 15
+# Per-locale dataset goals (DVC manifests should reach these before promote):
+#   zh-Hans: 2000 training + 2000 benchmark (incl. adversarial)
+#   en-US:   2000 training + 2000 benchmark (incl. adversarial)
 locales:
   zh-Hans:
     f1_min: 0.80
     fpr_max: 0.03
+    # goal_samples: 2000
+    # goal_benchmark: 2000
+    # goal_adversarial: 500
   en-US:
     f1_min: 0.90
     fpr_max: 0.02
+    # goal_samples: 2000
+    # goal_benchmark: 2000
+    # goal_adversarial: 500

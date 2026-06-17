@@ -45,7 +45,7 @@ func NewFeedbackStore(uri string) (*FeedbackStore, error) {
 func (s *FeedbackStore) Create(ctx context.Context, item ports.FeedbackItem) error {
 	_, err := s.col.InsertOne(ctx, bson.M{
 		"id": item.ID, "body": item.Body, "label": item.Label,
-		"locale": item.Locale, "trace_id": item.TraceID, "created_at": item.CreatedAt,
+		"locale": item.Locale, "tenant_id": item.TenantID, "trace_id": item.TraceID, "created_at": item.CreatedAt,
 	})
 	return err
 }
@@ -64,6 +64,7 @@ func (s *FeedbackStore) List(ctx context.Context, limit int) ([]ports.FeedbackIt
 			Body      string    `bson:"body"`
 			Label     string    `bson:"label"`
 			Locale    string    `bson:"locale"`
+			TenantID  string    `bson:"tenant_id"`
 			TraceID   string    `bson:"trace_id"`
 			CreatedAt time.Time `bson:"created_at"`
 		}
@@ -72,7 +73,7 @@ func (s *FeedbackStore) List(ctx context.Context, limit int) ([]ports.FeedbackIt
 		}
 		out = append(out, ports.FeedbackItem{
 			ID: doc.ID, Body: doc.Body, Label: doc.Label,
-			Locale: doc.Locale, TraceID: doc.TraceID, CreatedAt: doc.CreatedAt,
+			Locale: doc.Locale, TenantID: doc.TenantID, TraceID: doc.TraceID, CreatedAt: doc.CreatedAt,
 		})
 	}
 	return out, cur.Err()
@@ -161,7 +162,8 @@ func (s *AnalyticsStore) Insert(ctx context.Context, event ports.AnalyticsEvent)
 	}
 	_, err := s.col.InsertOne(ctx, bson.M{
 		"id": event.ID, "name": event.Name, "props": event.Props,
-		"device_id": event.DeviceID, "trace_id": event.TraceID, "created_at": ts,
+		"device_id": event.DeviceID, "tenant_id": event.TenantID,
+		"trace_id": event.TraceID, "created_at": ts,
 	})
 	return err
 }
@@ -204,6 +206,14 @@ func (s *AnalyticsStore) CountByName(ctx context.Context, since time.Time) (map[
 	return counts, cur.Err()
 }
 
+func (s *AnalyticsStore) DeleteByDeviceID(ctx context.Context, deviceID string) (int, error) {
+	res, err := s.col.DeleteMany(ctx, bson.M{"device_id": deviceID})
+	if err != nil {
+		return 0, err
+	}
+	return int(res.DeletedCount), nil
+}
+
 func scanAnalytics(cur *mongo.Cursor, ctx context.Context) ([]ports.AnalyticsEvent, error) {
 	var out []ports.AnalyticsEvent
 	for cur.Next(ctx) {
@@ -212,6 +222,7 @@ func scanAnalytics(cur *mongo.Cursor, ctx context.Context) ([]ports.AnalyticsEve
 			Name      string         `bson:"name"`
 			Props     map[string]any `bson:"props"`
 			DeviceID  string         `bson:"device_id"`
+			TenantID  string         `bson:"tenant_id"`
 			TraceID   string         `bson:"trace_id"`
 			CreatedAt time.Time      `bson:"created_at"`
 		}
@@ -220,7 +231,8 @@ func scanAnalytics(cur *mongo.Cursor, ctx context.Context) ([]ports.AnalyticsEve
 		}
 		out = append(out, ports.AnalyticsEvent{
 			ID: doc.ID, Name: doc.Name, Props: doc.Props,
-			DeviceID: doc.DeviceID, TraceID: doc.TraceID, Timestamp: doc.CreatedAt,
+			DeviceID: doc.DeviceID, TenantID: doc.TenantID,
+			TraceID: doc.TraceID, Timestamp: doc.CreatedAt,
 		})
 	}
 	return out, cur.Err()

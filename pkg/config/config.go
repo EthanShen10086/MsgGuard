@@ -41,8 +41,11 @@ type Features struct {
 }
 
 type Security struct {
-	MTLSAdminRequired bool   `yaml:"mtls_admin_required"`
-	MTLSClientHeader  string `yaml:"mtls_client_header"`
+	MTLSAdminRequired     bool   `yaml:"mtls_admin_required"`
+	MTLSClientHeader      string `yaml:"mtls_client_header"`
+	AuthBootstrapEnabled  bool   `yaml:"auth_bootstrap_enabled"`
+	DeviceTokenEnabled    bool   `yaml:"device_token_enabled"`
+	ModelDownloadAuth     bool   `yaml:"model_download_auth"`
 }
 
 type Gateway struct {

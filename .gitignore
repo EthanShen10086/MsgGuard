@@ -24,6 +24,10 @@ deploy/models/registry.json
 services/flywheel/worker
 **/flywheel/worker
 
+# Node (admin web)
+**/node_modules/
+apps/admin/dist/
+
 # Keep seed and benchmark test sets
 !ml/datasets/
 !ml/datasets/**

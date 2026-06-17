@@ -90,3 +90,15 @@
 - [x] iOS CoreMLFeaturizer + OTA featurizer_url
 - [x] macOS Mail host app + mail-client entitlement + Fastlane TestFlight/notarize lanes
 - [x] Mail extension invokeAgainWithBody + RFC822 body parsing
+
+## Phase 3 — Backend Platform Acceptance
+- [ ] `cd services/gateway && go build ./cmd/server` → success
+- [ ] `curl localhost:8080/health` → `ok`
+- [ ] `curl localhost:8080/metrics` → Prometheus text
+- [ ] `POST /api/v1/feedback` with device or Bearer → JSON id
+- [ ] `GET /api/v1/rules/latest` → rule bundle JSON with version + checksum
+- [ ] `GET /api/v1/models/latest` → model metadata (locale optional)
+- [ ] `./deploy/tiers/tier1-compose.sh` → gateway + postgres + caddy-site up
+- [ ] `helm template msgguard deploy/helm/msgguard` → Deployment YAML without errors
+- [ ] Gateway uses `pkg/app/container.go` — stores switchable via `DATABASE_DRIVER`
+- [ ] AASA template present under `deploy/` for universal links

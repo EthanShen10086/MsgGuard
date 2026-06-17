@@ -27,6 +27,19 @@ auth:
   secret: ""
 redis:
   url: ""
+  image: redis:7-alpine
+nats:
+  url: "nats://msgguard-nats:4222"
+  image: nats:2.10-alpine
+model:
+  port: 8083
+  image:
+    repository: msgguard/model
+    tag: latest
+flywheel:
+  image:
+    repository: msgguard/flywheel
+    tag: latest
 security:
   mtlsAdminRequired: false
   mtlsClientHeader: ""

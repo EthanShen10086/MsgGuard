@@ -24,6 +24,7 @@ import (
 
 	mgapp "github.com/EthanShen10086/msgguard/pkg/app"
 	"github.com/EthanShen10086/msgguard/pkg/httpauth"
+	gwmw "github.com/EthanShen10086/msgguard/services/gateway/internal/middleware"
 	"github.com/EthanShen10086/msgguard/services/gateway/internal/handler"
 )
 
@@ -32,7 +33,7 @@ func Run(c *mgapp.Container) error {
 	ctx := context.Background()
 
 	classifyHandler := handler.NewClassifyHandler(
-		c.LLMClassifier, c.CircuitBreaker, c.Cache, c.Config, c.Log, c.Queue,
+		c.LLMClassifier, c.ThreatIntel, c.CircuitBreaker, c.Cache, c.Config, c.Log, c.Queue,
 		c.QuotaStore, c.FlagStore,
 	)
 	feedbackHandler := handler.NewFeedbackHandler(c.Log, c.FeedbackStore, c.AuditWriter, c.Queue)
@@ -43,6 +44,22 @@ func Run(c *mgapp.Container) error {
 		c.Log, c.AnalyticsStore, c.FeedbackStore, c.Authenticator, c.Authorizer,
 		c.QuotaStore, c.FlagStore, shadowHandler,
 	)
+	privacyHandler := handler.NewPrivacyHandler(c.Log, c.AnalyticsStore)
+	modelAdminHandler := handler.NewModelAdminHandler(
+		c.Log, c.ModelRegistry, c.Authenticator, c.Authorizer,
+	)
+	entitlementsHandler := handler.NewEntitlementsHandler(c.Log, c.SubscriptionStore, c.AppStoreVerifier)
+	authCfg := gwmw.LoadAuthProductionConfig()
+	if c.Config.Security.AuthBootstrapEnabled {
+		authCfg.BootstrapTokenEnabled = true
+	}
+	if !c.Config.Security.DeviceTokenEnabled {
+		authCfg.DeviceTokenEnabled = false
+	}
+	if c.Config.Security.ModelDownloadAuth {
+		authCfg.ModelDownloadAuth = true
+	}
+	deviceIssuer := &httpauth.MemoryDeviceIssuer{Auth: c.Authenticator}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
@@ -50,7 +67,10 @@ func Run(c *mgapp.Container) error {
 		_, _ = w.Write([]byte("ok"))
 	})
 	mux.Handle("/metrics", metrics.HTTPHandler())
-	mux.HandleFunc("/api/v1/auth/token", adminHandler.IssueToken)
+	mux.HandleFunc("/api/v1/auth/token", gwmw.GateBootstrap(authCfg, adminHandler.IssueToken))
+	mux.HandleFunc("/api/v1/auth/device", httpauth.IssueDeviceTokenHandler(deviceIssuer, authCfg.DeviceTokenEnabled))
+	mux.HandleFunc("/api/v1/entitlements/verify", entitlementsHandler.Verify)
+	mux.HandleFunc("/api/v1/entitlements/status", entitlementsHandler.Status)
 	mux.HandleFunc("/api/v1/classify/defer", classifyHandler.Defer)
 	mux.HandleFunc("/api/v1/classify", classifyHandler.Classify)
 	mux.HandleFunc("/api/v1/classify/shadow", shadowHandler.Compare)
@@ -71,15 +91,19 @@ func Run(c *mgapp.Container) error {
 			feedbackHandler.List(w, r)
 			return
 		}
-		feedbackHandler.Create(w, r)
+		httpauth.RequireDeviceOrBearer(c.Authenticator, feedbackHandler.Create)(w, r)
 	})
-	mux.HandleFunc("/api/v1/analytics", analyticsHandler.Ingest)
+	mux.HandleFunc("/api/v1/analytics", httpauth.RequireDeviceOrBearer(c.Authenticator, analyticsHandler.Ingest))
+	mux.HandleFunc("/api/v1/privacy/me", privacyHandler.DeleteMe)
 	mux.HandleFunc("/api/v1/rules/latest", rulesHandler.Latest)
 	mux.HandleFunc("/api/v1/rules/register", rulesHandler.Register)
 	mux.HandleFunc("/api/v1/rules/", rulesHandler.ByVersion)
 	mux.HandleFunc("/api/v1/admin/metrics/summary", adminHandler.MetricsSummary)
 	mux.HandleFunc("/api/v1/admin/quota/whitelist", adminHandler.QuotaWhitelist)
 	mux.HandleFunc("/api/v1/admin/flags", adminHandler.FeatureFlags)
+	mux.HandleFunc("/api/v1/admin/models/promote", modelAdminHandler.Promote)
+	mux.HandleFunc("/api/v1/admin/models/rollback", modelAdminHandler.Rollback)
+	modelProxy := proxyTo(c.Config.Gateway.ModelAddr)
 	mux.HandleFunc("/api/v1/models/register", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			claims, err := authenticate(c, r)
@@ -93,9 +117,15 @@ func Run(c *mgapp.Container) error {
 				return
 			}
 		}
-		proxyTo(c.Config.Gateway.ModelAddr).ServeHTTP(w, r)
+		modelProxy.ServeHTTP(w, r)
 	})
-	mux.Handle("/api/v1/models/", proxyTo(c.Config.Gateway.ModelAddr))
+	mux.HandleFunc("/api/v1/models/", func(w http.ResponseWriter, r *http.Request) {
+		if authCfg.ModelDownloadAuth && strings.Contains(r.URL.Path, "/download/") {
+			httpauth.RequireModelRead(c.Authenticator, c.Authorizer, modelProxy.ServeHTTP)(w, r)
+			return
+		}
+		modelProxy.ServeHTTP(w, r)
+	})
 	handler.RegisterHealthRoutes(mux)
 
 	recorder := metrics.NewPrometheusRecorder()
@@ -118,6 +148,7 @@ func Run(c *mgapp.Container) error {
 	if c.Tracer != nil {
 		mws = append([]kitmw.Func{kitmw.Tracing(c.Tracer)}, mws...)
 	}
+	mws = append(mws, httpauth.OIDCMiddleware("/api/v1/admin/"))
 	if mtlsAdminRequired(c) {
 		prefixes := []string{"/api/v1/admin/"}
 		if h := mtlsClientHeader(c); h != "" {

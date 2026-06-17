@@ -2,6 +2,11 @@ features:
   cloud_llm: false
   crash_report_upload: false
   ip_whitelist_enabled: false
+security:
+  auth_bootstrap_enabled: true
+  device_token_enabled: true
+  model_download_auth: false
+  mtls_admin_required: false
 gateway:
   port: 8080
   rate_limit_rps: 100

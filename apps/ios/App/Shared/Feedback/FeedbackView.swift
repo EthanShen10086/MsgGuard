@@ -14,6 +14,7 @@ struct FeedbackView: View {
                     Text("misclassification").tag("misclassification")
                     Text("bug").tag("bug")
                     Text("feature").tag("feature")
+                    Text("appeal").tag("appeal")
                 }
                 TextField(String(localized: "feedback.description"), text: $description, axis: .vertical)
                     .lineLimit(3 ... 8)

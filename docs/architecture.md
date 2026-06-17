@@ -1,48 +1,86 @@
-# MsgGuard Architecture
+# MsgGuard Architecture Overview
 
-## Overview
+**Last updated:** 2026-06-17
 
-MsgGuard is a hybrid AI spam SMS filter with three layers:
+MsgGuard is a hybrid on-device + optional cloud AI spam filter for SMS (iOS primary), with macOS Mail extension and a Go backend for rules/models, feedback, and admin.
 
-1. **iOS Platform App** — App Store product, onboarding, rules, feedback, subscription
-2. **Message Filter Extension** — On-device L0-L2 classification (<15ms)
-3. **Go Backend** — Rules/model CDN, optional cloud LLM (defer), feedback with TraceID
+## Target Architecture
 
-## iOS Targets
+```mermaid
+flowchart TB
+  subgraph clients [Clients]
+    iOS[iOS App + Filter Extension]
+    macOS[macOS Mail Extension]
+    Android[Android - Planned]
+    AdminWeb[Admin Web - Phase 4]
+  end
 
-| Target | Role |
-|--------|------|
-| MsgGuard-iOS | Main SwiftUI app (platform carrier) |
-| MessageFilterExtension | IdentityLookup filter engine |
-| MsgGuardWidget | Today blocked count widget |
+  subgraph edge [Edge / CDN]
+    Caddy[Caddy Static Site]
+    RulesCDN[Rules CDN]
+  end
 
-## SPM Packages
+  subgraph backend [Backend Platform]
+    GW[Gateway :8080]
+    Rules[Rules :8081]
+    Model[Model :8083]
+    Flywheel[Flywheel Worker]
+  end
 
-- `SharedModels` — Types, AppConstants, MGLogger
-- `DesignSystem` — Theme, UserMode, components
-- `FilterEngine` — L0 heuristics, L1 Bayes, L2 Core ML stub
-- `BlocklistStore` — App Group persistence actor
+  subgraph data [Data]
+    PG[(PostgreSQL / MongoDB)]
+    Redis[(Redis Cache)]
+    NATS[NATS Queue]
+  end
 
-## Backend Services
+  subgraph ml [ML Flywheel]
+    Train[Train / Benchmark]
+    Export[CoreML Export]
+    Retrain[Cron Retrain]
+  end
 
-| Service | Port | Role |
-|---------|------|------|
-| gateway | 8080 | API entry, middleware stack, classify defer |
-| rules | 8081 | Rule bundle distribution |
-| classify | 8082 | Stub (logic in gateway) |
-| model | 8083 | Core ML metadata CDN |
-| feedback | 8084 | Stub (logic in gateway) |
+  subgraph obs [Observability]
+    Prom[Prometheus]
+    Graf[Grafana]
+    Jaeger[Jaeger]
+  end
 
-## Data Flow
-
+  iOS -->|L0-L2 on-device| iOS
+  iOS -->|opt-in defer| GW
+  iOS -->|rules sync| RulesCDN
+  macOS --> GW
+  AdminWeb -->|admin API| GW
+  GW --> Rules
+  GW --> Model
+  GW --> PG
+  GW --> Redis
+  GW --> NATS
+  Flywheel --> NATS
+  Flywheel --> Train
+  Train --> Export
+  Retrain --> Train
+  GW --> Prom
+  Prom --> Graf
+  GW --> Jaeger
+  Caddy -->|privacy/support/pricing/status| clients
 ```
-SMS → Extension → FilterEngine (L0→L1→L2) → Messages.app
-                      ↓ opt-in
-                 iOS defer → Gateway → LLM
-Main App → BlocklistStore → App Group → Extension reads rules
-```
 
-## Observability
+## Sub-documents
 
-- iOS: MGLogger, AnalyticsManager, PerformanceMonitor (OSSignpost)
-- Backend: RequestID → OpenTelemetry → Jaeger, Prometheus /metrics
+| Area | Document | Status |
+|------|----------|--------|
+| iOS client | [client-ios.md](architecture/client-ios.md) | Implemented |
+| macOS Mail | [client-macos.md](architecture/client-macos.md) | In Progress |
+| Android | [client-android.md](architecture/client-android.md) | Planned |
+| Backend platform | [backend-platform.md](architecture/backend-platform.md) | Implemented |
+| ML flywheel | [ml-flywheel.md](architecture/ml-flywheel.md) | Implemented |
+| Auth & security | [auth-security.md](architecture/auth-security.md) | In Progress |
+| Commercial / tiers | [commercial.md](architecture/commercial.md) | In Progress |
+| Admin web | [admin-web.md](architecture/admin-web.md) | In Progress |
+
+## Related
+
+- [Threat model](../security/THREAT_MODEL.md)
+- [Tier matrix](../deploy/TIER_MATRIX.md)
+- [OpenAPI](../api/openapi.yaml)
+- [Commercial readiness](../COMMERCIAL_READINESS.md)

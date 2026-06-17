@@ -53,3 +53,22 @@ func (s *AnalyticsStore) CountByName(ctx context.Context, since time.Time) (map[
 	}
 	return counts, nil
 }
+
+func (s *AnalyticsStore) DeleteByDeviceID(ctx context.Context, deviceID string) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if deviceID == "" {
+		return 0, nil
+	}
+	var kept []ports.AnalyticsEvent
+	deleted := 0
+	for _, e := range s.events {
+		if e.DeviceID == deviceID {
+			deleted++
+			continue
+		}
+		kept = append(kept, e)
+	}
+	s.events = kept
+	return deleted, nil
+}

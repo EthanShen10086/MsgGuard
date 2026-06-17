@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-model
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-model
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-model
+    spec:
+      containers:
+        - name: model
+          image: "{{ .Values.model.image.repository }}:{{ .Values.model.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.model.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.model.port }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.model.port }}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MsgGuard Status</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+    h1 { font-size: 1.75rem; }
+    .ok { color: #0a7; font-weight: 600; }
+    .planned { color: #b80; }
+    ul { padding-left: 1.25rem; }
+    a { color: #0066cc; }
+    .muted { color: #666; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>MsgGuard Status</h1>
+  <p class="muted"><a href="/">← MsgGuard</a> · Last updated: 2026-06-17</p>
+
+  <p>All systems <span class="ok">operational</span> (manual stub — automated probes planned Phase 12).</p>
+
+  <h2>Components</h2>
+  <ul>
+    <li><span class="ok">●</span> iOS App &amp; Filter Extension — operational</li>
+    <li><span class="ok">●</span> Rules CDN — operational</li>
+    <li><span class="ok">●</span> Model CDN — operational</li>
+    <li><span class="planned">●</span> Cloud AI (defer) — operational; upstream LLM subject to provider SLA</li>
+    <li><span class="planned">●</span> Public uptime API — planned</li>
+  </ul>
+
+  <h2>Incidents</h2>
+  <p class="muted">No recent incidents reported.</p>
+
+  <p>Subscribe to updates: <a href="mailto:status@msgguard.app">status@msgguard.app</a></p>
+  <p class="muted"><a href="/support/">Support</a> · <a href="/pricing.html">Pricing</a></p>
+</body>
+</html>

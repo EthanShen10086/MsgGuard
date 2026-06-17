@@ -57,6 +57,9 @@ public actor APIClient {
         request.httpBody = endpoint.body
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(traceID, forHTTPHeaderField: "X-Request-ID")
+        if let token = try? await DeviceAuthService.shared.ensureAuthenticated() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
 
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else {
@@ -81,6 +84,9 @@ public actor APIClient {
         request.httpBody = endpoint.body
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(traceID, forHTTPHeaderField: "X-Request-ID")
+        if let token = try? await DeviceAuthService.shared.ensureAuthenticated() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
         if let etag = ifNoneMatch, !etag.isEmpty {
             request.setValue("\"\(etag)\"", forHTTPHeaderField: "If-None-Match")
         }

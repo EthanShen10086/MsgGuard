@@ -24,21 +24,24 @@ func NewFeedbackStore(dsn string) (*FeedbackStore, error) {
 	s := &FeedbackStore{db: db}
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS feedback (
 		id TEXT PRIMARY KEY, body TEXT, label TEXT, locale TEXT,
-		trace_id TEXT, created_at TIMESTAMPTZ DEFAULT NOW()
+		tenant_id TEXT, trace_id TEXT, created_at TIMESTAMPTZ DEFAULT NOW()
 	)`)
+	if err == nil {
+		_, _ = db.Exec(`ALTER TABLE feedback ADD COLUMN IF NOT EXISTS tenant_id TEXT`)
+	}
 	return s, err
 }
 
 func (s *FeedbackStore) Create(ctx context.Context, item ports.FeedbackItem) error {
 	_, err := s.db.ExecContext(ctx,
-		`INSERT INTO feedback (id, body, label, locale, trace_id, created_at) VALUES ($1,$2,$3,$4,$5,$6)`,
-		item.ID, item.Body, item.Label, item.Locale, item.TraceID, item.CreatedAt,
+		`INSERT INTO feedback (id, body, label, locale, tenant_id, trace_id, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+		item.ID, item.Body, item.Label, item.Locale, nullIfEmpty(item.TenantID), item.TraceID, item.CreatedAt,
 	)
 	return err
 }
 
 func (s *FeedbackStore) List(ctx context.Context, limit int) ([]ports.FeedbackItem, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, body, label, locale, trace_id, created_at FROM feedback ORDER BY created_at DESC LIMIT $1`, limit)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, body, label, locale, tenant_id, trace_id, created_at FROM feedback ORDER BY created_at DESC LIMIT $1`, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +49,12 @@ func (s *FeedbackStore) List(ctx context.Context, limit int) ([]ports.FeedbackIt
 	var out []ports.FeedbackItem
 	for rows.Next() {
 		var item ports.FeedbackItem
-		if err := rows.Scan(&item.ID, &item.Body, &item.Label, &item.Locale, &item.TraceID, &item.CreatedAt); err != nil {
+		var tenantID sql.NullString
+		if err := rows.Scan(&item.ID, &item.Body, &item.Label, &item.Locale, &tenantID, &item.TraceID, &item.CreatedAt); err != nil {
 			return nil, err
+		}
+		if tenantID.Valid {
+			item.TenantID = tenantID.String
 		}
 		out = append(out, item)
 	}
@@ -108,5 +115,12 @@ func (s *RuleStore) Save(ctx context.Context, bundle ports.RuleBundle) error {
 }
 
 func (s *FeedbackStore) Close() error { return s.db.Close() }
+
+func nullIfEmpty(s string) any {
+	if s == "" {
+		return nil
+	}
+	return s
+}
 
 func NowUTC() time.Time { return time.Now().UTC() }

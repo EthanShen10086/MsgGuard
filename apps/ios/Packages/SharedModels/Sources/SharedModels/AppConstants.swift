@@ -21,6 +21,7 @@ public enum AppConstants {
         public static let bayesModel = "bayes_model.json"
         public static let statsSnapshot = "stats_snapshot.json"
         public static let coreMLModel = "spam_classifier.mlmodelc"
+        public static let callBlocklist = "call_blocklist.json"
     }
 
     public enum URLSchemes {

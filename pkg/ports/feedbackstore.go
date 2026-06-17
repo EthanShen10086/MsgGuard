@@ -10,6 +10,7 @@ type FeedbackItem struct {
 	Body      string    `json:"body"`
 	Label     string    `json:"label"`
 	Locale    string    `json:"locale"`
+	TenantID  string    `json:"tenant_id,omitempty"`
 	TraceID   string    `json:"trace_id"`
 	CreatedAt time.Time `json:"created_at"`
 }

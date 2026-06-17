@@ -18,6 +18,7 @@ actor ModelUpdateService {
     }
 
     func checkAndUpdate(locale: String? = nil) async throws {
+        _ = try await DeviceAuthService.shared.ensureAuthenticated()
         let config = try await store.loadConfig()
         let activeLocale = locale ?? config.locale
         let meta: ModelMeta = try await client.request(
@@ -60,6 +61,7 @@ actor ModelUpdateService {
         if let bayesPath = meta.bayes_url {
             try await downloadBayes(relativePath: bayesPath, locale: activeLocale)
         }
+        try? CallDirectorySync.reloadExtension()
         WidgetCenter.shared.reloadAllTimelines()
     }
 

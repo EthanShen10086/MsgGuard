@@ -30,6 +30,7 @@ type feedbackRequest struct {
 	Label       string `json:"label"`
 	Body        string `json:"body"`
 	Locale      string `json:"locale"`
+	TenantID    string `json:"tenant_id"`
 	TraceID     string `json:"traceID"`
 }
 
@@ -70,7 +71,7 @@ func (h *FeedbackHandler) Create(w http.ResponseWriter, r *http.Request) {
 		text = req.Description
 	}
 	item := ports.FeedbackItem{
-		ID: id, Body: text, Label: label, Locale: req.Locale,
+		ID: id, Body: text, Label: label, Locale: req.Locale, TenantID: req.TenantID,
 		TraceID: traceID, CreatedAt: time.Now().UTC(),
 	}
 	_ = h.store.Create(r.Context(), item)

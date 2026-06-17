@@ -184,6 +184,27 @@ else
   fail "httpauth mTLS tests"
 fi
 
+if test -f docs/architecture/client-ios.md && test -f docs/security/THREAT_MODEL.md; then
+  ok "architecture docs v3"
+else
+  fail "architecture docs v3"
+fi
+if test -f apps/admin/dist/index.html 2>/dev/null || test -f apps/admin/package.json; then
+  ok "web admin app"
+else
+  fail "web admin app"
+fi
+if test -f apps/android/README.md && test -f docs/enterprise/OVERVIEW.md; then
+  ok "android + enterprise docs"
+else
+  fail "android + enterprise docs"
+fi
+if test -f pkg/adapters/threatintel/safebrowsing.go; then
+  ok "threat intel adapter"
+else
+  fail "threat intel adapter"
+fi
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 if [[ "$FAIL" -gt 0 ]]; then

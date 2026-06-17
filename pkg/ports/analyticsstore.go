@@ -10,6 +10,7 @@ type AnalyticsEvent struct {
 	Name      string         `json:"name"`
 	Props     map[string]any `json:"props"`
 	DeviceID  string         `json:"device_id"`
+	TenantID  string         `json:"tenant_id,omitempty"`
 	TraceID   string         `json:"trace_id"`
 	Timestamp time.Time      `json:"timestamp"`
 }
@@ -18,4 +19,5 @@ type AnalyticsStore interface {
 	Insert(ctx context.Context, event AnalyticsEvent) error
 	List(ctx context.Context, since time.Time, limit int) ([]AnalyticsEvent, error)
 	CountByName(ctx context.Context, since time.Time) (map[string]int, error)
+	DeleteByDeviceID(ctx context.Context, deviceID string) (int, error)
 }

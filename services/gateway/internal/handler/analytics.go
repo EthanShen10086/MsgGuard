@@ -31,6 +31,7 @@ func (h *AnalyticsHandler) Ingest(w http.ResponseWriter, r *http.Request) {
 		Name     string         `json:"name"`
 		Props    map[string]any `json:"props"`
 		DeviceID string         `json:"device_id"`
+		TenantID string         `json:"tenant_id"`
 	}
 	if err := json.Unmarshal(body, &req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -39,7 +40,8 @@ func (h *AnalyticsHandler) Ingest(w http.ResponseWriter, r *http.Request) {
 	traceID := r.Header.Get("X-Request-ID")
 	event := ports.AnalyticsEvent{
 		ID: uuid.NewString(), Name: req.Name, Props: req.Props,
-		DeviceID: req.DeviceID, TraceID: traceID, Timestamp: time.Now().UTC(),
+		DeviceID: req.DeviceID, TenantID: req.TenantID,
+		TraceID: traceID, Timestamp: time.Now().UTC(),
 	}
 	_ = h.store.Insert(r.Context(), event)
 	h.log.Info("analytics", logger.Field{Key: "event", Value: req.Name})
