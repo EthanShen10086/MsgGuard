@@ -7,7 +7,7 @@ on:
     branches: [main, master, staging]
 
 env:
-  VOXERA_KIT_SHA: c0375208a50f03c705ee45e0ab9893d3c2aef98e
+  VOXERA_KIT_SHA: ${{ vars.VOXERA_KIT_SHA || '58be0db49ee7623b0d05a9df2b0fefcc0d73f6d2' }}
 
 jobs:
   swift-packages:
@@ -40,15 +40,18 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+      - name: Read voxera-kit pin
+        id: kitpin
+        run: echo "sha=$(cat .github/voxera-kit-pin)" >> "$GITHUB_OUTPUT"
       - name: Checkout voxera-kit (pinned)
         run: |
           git clone https://github.com/EthanShen10086/voxera-kit.git ../voxera-kit
-          cd ../voxera-kit && git checkout "${VOXERA_KIT_SHA}"
+          cd ../voxera-kit && git checkout "${{ steps.kitpin.outputs.sha }}"
       - name: Go test (race)
         run: |
           cd pkg/adapters/memory && go test -race ./...
-          cd ../../httpauth && go test -race ./...
-          cd ../../../services/gateway/internal/handler && go test -race ./...
+          cd "$GITHUB_WORKSPACE/pkg/httpauth" && go test -race ./...
+          cd "$GITHUB_WORKSPACE/services/gateway/internal/handler" && go test -race ./...
       - name: Go build all services
         run: |
           for svc in gateway model admin rules classify feedback flywheel; do
@@ -116,9 +119,12 @@ jobs:
         with:
           python-version: "3.11"
       - uses: azure/setup-helm@v4
+      - name: Read voxera-kit pin
+        id: kitpin
+        run: echo "sha=$(cat .github/voxera-kit-pin)" >> "$GITHUB_OUTPUT"
       - name: Checkout voxera-kit (pinned)
         run: |
           git clone https://github.com/EthanShen10086/voxera-kit.git ../voxera-kit
-          cd ../voxera-kit && git checkout "${VOXERA_KIT_SHA}"
+          cd ../voxera-kit && git checkout "${{ steps.kitpin.outputs.sha }}"
       - run: pip install -r requirements.txt
       - run: bash scripts/verify.sh

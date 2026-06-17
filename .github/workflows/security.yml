@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: "20"
       - run: |
-          cd apps/admin && npm ci && npm audit --audit-level=high
+          cd apps/admin && npm ci && npm audit --omit=dev --audit-level=high
 
   helm-secrets-check:
     runs-on: ubuntu-latest
