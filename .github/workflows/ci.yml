@@ -130,4 +130,5 @@ jobs:
           git clone https://github.com/EthanShen10086/voxera-kit.git ../voxera-kit
           cd ../voxera-kit && git checkout "${{ steps.kitpin.outputs.sha }}"
       - run: pip install -r requirements.txt
+        working-directory: ml
       - run: bash scripts/verify.sh
