@@ -7,6 +7,9 @@ service:
 ingress:
   enabled: true
   host: api.msgguard.app
+  waf:
+    enabled: false
+    annotations: {}
   mtls:
     enabled: false
     secretName: msgguard-mtls-ca
@@ -40,9 +43,24 @@ flywheel:
   image:
     repository: msgguard/flywheel
     tag: latest
+  minInterval: "30m"
+  minBatch: "5"
 security:
   mtlsAdminRequired: false
   mtlsClientHeader: ""
+  authBootstrapEnabled: true
+  deviceTokenEnabled: true
+  modelDownloadAuth: false
+  appAttestRequired: false
+oidc:
+  issuer: ""
+  clientId: ""
+  clientSecret: ""
+  redirectUrl: ""
+  adminEmails: ""
+  adminDomain: ""
+  enforceAdmin: false
+  adminUiUrl: "https://admin.msgguard.app"
 config:
   cloudLLM: false
 certManager:

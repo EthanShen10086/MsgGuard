@@ -1,6 +1,12 @@
 replicaCount: 3
+env: production
 ingress:
   host: api.msgguard.app
+  waf:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/limit-rps: "50"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
   mtls:
     enabled: false
     secretName: msgguard-mtls-ca
@@ -17,6 +23,22 @@ redis:
 security:
   mtlsAdminRequired: false
   mtlsClientHeader: "X-Client-Cert-Subject"
+  authBootstrapEnabled: false
+  deviceTokenEnabled: true
+  modelDownloadAuth: true
+  appAttestRequired: false
+flywheel:
+  minInterval: "1h"
+  minBatch: "10"
+oidc:
+  issuer: ""
+  clientId: ""
+  clientSecret: ""
+  redirectUrl: "https://api.msgguard.app/api/v1/auth/oidc/callback"
+  adminEmails: ""
+  adminDomain: "msgguard.app"
+  enforceAdmin: true
+  adminUiUrl: "https://admin.msgguard.app"
 config:
   cloudLLM: true
 certManager:

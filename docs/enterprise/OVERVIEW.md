@@ -12,7 +12,7 @@ MsgGuard ships consumer-first (iOS Message Filter, optional cloud LLM). Enterpri
 ## Phase 7 stubs (current)
 
 - **Tenant column** — `tenant_id` optional on `feedback` and `analytics_events` (Postgres migration `001_add_tenant_id.sql`). Handlers accept `tenant_id` in JSON; empty means consumer/default tenant.
-- **OIDC** — `pkg/httpauth/oidc.go` returns `501` when `OIDC_ISSUER` is set but `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` are not configured. Full IdP integration is a follow-on.
+- **OIDC** — `pkg/httpauth/oidc_provider.go` authorization-code flow for admin; set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ADMIN_EMAILS` or `OIDC_ADMIN_DOMAIN`. Production: `OIDC_ENFORCE_ADMIN=true` disables bootstrap token.
 - **Admin** — Model promote/rollback and canary flags via `/api/v1/admin/models/*` and `ml/scripts/canary_rollout.py`.
 
 ## Near-term roadmap

@@ -37,8 +37,8 @@ Honest status: **Implemented** / **In Progress** / **Planned**
 | Runbooks (LLM/DB/model rollback) | Implemented |
 | Auth/RBAC + admin API | Implemented |
 | Product metrics flywheel | Implemented |
-| OIDC / SSO for admin | Planned |
-| WAF / DDoS edge | Planned |
+| OIDC / SSO for admin | Implemented (configure `OIDC_*` at deploy) |
+| WAF / DDoS edge | Documented + Helm ingress rate-limit (`docs/security/EDGE_WAF.md`) |
 
 ## Architecture (Phase 2)
 
@@ -76,17 +76,33 @@ Honest status: **Implemented** / **In Progress** / **Planned**
 
 | Item | Status |
 |------|--------|
-| Admin SPA (Dashboard, Feedback, Models, Flags, Quota) | In Progress |
-| pricing.html | In Progress |
-| Expanded support links | In Progress |
+| Admin SPA (Dashboard, Feedback, Models, Flags, Quota) | Implemented |
+| pricing.html | Implemented |
+| Expanded support links | Implemented |
+
+## Phase 7 — Commercial platform (2026-06)
+
+| Item | Status |
+|------|--------|
+| CI: `staging` / `release` / `ios-beta` / `security` workflows | Implemented |
+| Production AUTH_SECRET startup gate | Implemented |
+| Redis token revocation | Implemented (requires `REDIS_URL`) |
+| App Attest middleware stub | Implemented |
+| App Store Server API client + webhook | Implemented (Apple creds at deploy) |
+| S3 model registry overlay | Implemented (requires `MODEL_S3_BUCKET`) |
+| Flywheel debounce (`FLYWHEEL_MIN_*`) | Implemented |
+| OpenAPI entitlements/auth/webhooks | Implemented |
+| Helm prod security defaults | Implemented |
+
+**Still requires deploy-time secrets (not in repo):** `PROD_AUTH_SECRET`, `APPLE_*`, `KUBE_CONFIG_PROD`, ASC for TestFlight, real S3/AWS SDK upload wiring.
 
 ## Phase 5 — SRE & Privacy
 
 | Item | Status |
 |------|--------|
-| SLO document | In Progress |
-| Privacy DELETE endpoint | In Progress |
-| Prometheus alert rules template | In Progress |
+| SLO document | Implemented |
+| Privacy DELETE endpoint | Implemented |
+| Prometheus alert rules template | Implemented |
 
 ## Phase 6 — Analytics v2
 

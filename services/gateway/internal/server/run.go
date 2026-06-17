@@ -49,6 +49,7 @@ func Run(c *mgapp.Container) error {
 		c.Log, c.ModelRegistry, c.Authenticator, c.Authorizer,
 	)
 	entitlementsHandler := handler.NewEntitlementsHandler(c.Log, c.SubscriptionStore, c.AppStoreVerifier)
+	webhookHandler := handler.NewWebhookHandler(c.Log, c.SubscriptionStore, c.AppStoreVerifier)
 	authCfg := gwmw.LoadAuthProductionConfig()
 	if c.Config.Security.AuthBootstrapEnabled {
 		authCfg.BootstrapTokenEnabled = true
@@ -60,6 +61,16 @@ func Run(c *mgapp.Container) error {
 		authCfg.ModelDownloadAuth = true
 	}
 	deviceIssuer := &httpauth.MemoryDeviceIssuer{Auth: c.Authenticator}
+	oidcProvider, err := httpauth.NewOIDCProviderFromEnv(c.Authenticator)
+	if err != nil {
+		return fmt.Errorf("oidc: %w", err)
+	}
+	if oidcProvider.Enabled() {
+		c.Log.Info("oidc admin sso enabled")
+	}
+	if oidcProvider.EnforceAdmin() {
+		authCfg.BootstrapTokenEnabled = false
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
@@ -68,9 +79,15 @@ func Run(c *mgapp.Container) error {
 	})
 	mux.Handle("/metrics", metrics.HTTPHandler())
 	mux.HandleFunc("/api/v1/auth/token", gwmw.GateBootstrap(authCfg, adminHandler.IssueToken))
+	mux.HandleFunc("/api/v1/auth/oidc/config", oidcProvider.ConfigHandler())
+	mux.HandleFunc("/api/v1/auth/oidc/login", oidcProvider.LoginHandler())
+	mux.HandleFunc("/api/v1/auth/oidc/callback", oidcProvider.CallbackHandler())
 	mux.HandleFunc("/api/v1/auth/device", httpauth.IssueDeviceTokenHandler(deviceIssuer, authCfg.DeviceTokenEnabled))
-	mux.HandleFunc("/api/v1/entitlements/verify", entitlementsHandler.Verify)
+	mux.HandleFunc("/api/v1/entitlements/verify", httpauth.ChainDeviceAuth(func(w http.ResponseWriter, r *http.Request) {
+		entitlementsHandler.Verify(w, r)
+	}))
 	mux.HandleFunc("/api/v1/entitlements/status", entitlementsHandler.Status)
+	mux.HandleFunc("/api/v1/webhooks/appstore", webhookHandler.AppStore)
 	mux.HandleFunc("/api/v1/classify/defer", classifyHandler.Defer)
 	mux.HandleFunc("/api/v1/classify", classifyHandler.Classify)
 	mux.HandleFunc("/api/v1/classify/shadow", shadowHandler.Compare)
@@ -91,9 +108,9 @@ func Run(c *mgapp.Container) error {
 			feedbackHandler.List(w, r)
 			return
 		}
-		httpauth.RequireDeviceOrBearer(c.Authenticator, feedbackHandler.Create)(w, r)
+		httpauth.RequireDeviceOrBearer(c.Authenticator, httpauth.ChainDeviceAuth(feedbackHandler.Create))(w, r)
 	})
-	mux.HandleFunc("/api/v1/analytics", httpauth.RequireDeviceOrBearer(c.Authenticator, analyticsHandler.Ingest))
+	mux.HandleFunc("/api/v1/analytics", httpauth.RequireDeviceOrBearer(c.Authenticator, httpauth.ChainDeviceAuth(analyticsHandler.Ingest)))
 	mux.HandleFunc("/api/v1/privacy/me", privacyHandler.DeleteMe)
 	mux.HandleFunc("/api/v1/rules/latest", rulesHandler.Latest)
 	mux.HandleFunc("/api/v1/rules/register", rulesHandler.Register)
@@ -148,7 +165,7 @@ func Run(c *mgapp.Container) error {
 	if c.Tracer != nil {
 		mws = append([]kitmw.Func{kitmw.Tracing(c.Tracer)}, mws...)
 	}
-	mws = append(mws, httpauth.OIDCMiddleware("/api/v1/admin/"))
+	mws = append(mws, httpauth.OIDCMiddleware(oidcProvider, "/api/v1/admin/"))
 	if mtlsAdminRequired(c) {
 		prefixes := []string{"/api/v1/admin/"}
 		if h := mtlsClientHeader(c); h != "" {

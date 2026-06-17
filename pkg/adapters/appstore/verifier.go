@@ -17,10 +17,15 @@ type VerificationResult struct {
 	ExpiresAt    *time.Time
 }
 
-// Verifier validates App Store signed transaction JWS structure (stub; no Apple API calls).
-type Verifier struct{}
+// Verifier validates App Store signed transactions (JWS parse + optional Apple API).
+type Verifier struct {
+	client *Client
+}
 
-func NewVerifier() *Verifier { return &Verifier{} }
+func NewVerifier() *Verifier {
+	c, _ := NewClientFromEnv()
+	return &Verifier{client: c}
+}
 
 // VerifySignedTransaction checks JWS structure and decodes the payload header fields.
 func (v *Verifier) VerifySignedTransaction(signedTransaction, productID string) (*VerificationResult, error) {

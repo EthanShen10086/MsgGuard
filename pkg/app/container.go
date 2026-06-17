@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -30,6 +31,7 @@ import (
 	natsadapter "github.com/EthanShen10086/msgguard/pkg/adapters/nats"
 	pgadapters "github.com/EthanShen10086/msgguard/pkg/adapters/postgres"
 	redisadapters "github.com/EthanShen10086/msgguard/pkg/adapters/redis"
+	s3adapter "github.com/EthanShen10086/msgguard/pkg/adapters/s3"
 	tiadapter "github.com/EthanShen10086/msgguard/pkg/adapters/threatintel"
 	"github.com/EthanShen10086/msgguard/pkg/config"
 	"github.com/EthanShen10086/msgguard/pkg/ports"
@@ -107,14 +109,28 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 
 	secret := envOr("AUTH_SECRET", "")
 	allowDev := os.Getenv("MSGGUARD_ENV") != "production" && os.Getenv("MSGGUARD_ENV") != "prod"
-	if err := memadapters.ValidateSecret(secret, os.Getenv("MSGGUARD_ENV"), allowDev); err != nil && os.Getenv("CI") != "true" {
-		log.Info("auth secret warning", logger.Field{Key: "error", Value: err.Error()})
+	if err := memadapters.ValidateSecret(secret, os.Getenv("MSGGUARD_ENV"), allowDev); err != nil {
+		if allowDev || os.Getenv("CI") == "true" {
+			log.Info("auth secret warning", logger.Field{Key: "error", Value: err.Error()})
+		} else {
+			return nil, fmt.Errorf("auth: %w", err)
+		}
 	}
 	if secret == "" && allowDev {
 		secret = "msgguard-dev-secret"
 	}
 	memAuth := memadapters.NewAuthWithOptions(secret, allowDev)
-	c.Authenticator = memAuth
+	authSvc := auth.Authenticator(memAuth)
+	redisURL := envOr("REDIS_URL", "")
+	if redisURL != "" {
+		if revStore, err := redisadapters.NewRevocationStore(redisURL); err == nil {
+			authSvc = redisadapters.NewRevokingAuth(memAuth, revStore)
+			log.Info("redis token revocation enabled")
+		} else {
+			log.Info("redis revocation unavailable", logger.Field{Key: "error", Value: err.Error()})
+		}
+	}
+	c.Authenticator = authSvc
 	c.Authorizer = memAuth
 
 	c.RateLimiter = rlMemory.New(ratelimiter.Config{
@@ -255,10 +271,19 @@ func wireModelRegistry(cfg *config.Config, log logger.Logger) ports.ModelRegistr
 	if path == "" {
 		path = "./deploy/models"
 	}
+	var inner ports.ModelRegistry
 	if reg, err := fsadapter.NewModelRegistry(path); err == nil {
-		return reg
+		inner = reg
+	} else {
+		inner = memadapters.NewModelRegistry()
 	}
-	return memadapters.NewModelRegistry()
+	if os.Getenv("MODEL_S3_BUCKET") != "" {
+		if s3reg, err := s3adapter.NewModelRegistry(inner); err == nil {
+			log.Info("s3 model registry overlay enabled", logger.Field{Key: "bucket", Value: os.Getenv("MODEL_S3_BUCKET")})
+			return s3reg
+		}
+	}
+	return inner
 }
 
 func wireThreatIntel(log logger.Logger) ports.ThreatIntel {

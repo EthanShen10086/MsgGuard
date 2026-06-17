@@ -28,6 +28,18 @@
 | Prometheus + Grafana | metrics | — |
 | Caddy | TLS/reverse proxy | Nginx |
 
+## CI/CD & Release
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `ci.yml` | push/PR `main`, `staging` | Build & test gate (Swift, Go, Helm, ML) |
+| `deploy-staging.yml` | push `staging` | Helm validate, image build, optional K8s deploy |
+| `release.yml` | tag `v*.*.*` | ML gate → GHCR → canary → prod |
+| `ios-beta.yml` | manual | TestFlight (requires ASC secrets) |
+| `security.yml` | weekly + PR | gosec, npm audit |
+
+See [RELEASE.md](RELEASE.md) and [CONTRIBUTING.md](../CONTRIBUTING.md) for branch strategy.
+
 ## Cloud (Tier 3+)
 | Tool | Purpose |
 |------|---------|

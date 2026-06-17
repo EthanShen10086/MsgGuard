@@ -1,0 +1,60 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - run: |
+          helm template msgguard deploy/helm/msgguard \
+            -f deploy/helm/msgguard/values-staging.yaml \
+            -f deploy/helm/msgguard/values-mongodb.yaml \
+            --set auth.secret="${{ secrets.STAGING_AUTH_SECRET || 'staging-placeholder-secret-32chars-min' }}" \
+            | grep -q Deployment
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - run: |
+          docker build -f deploy/Dockerfile.gateway -t msgguard/gateway:staging .
+          docker build -f deploy/Dockerfile.model -t msgguard/model:staging .
+          docker build -f deploy/Dockerfile.flywheel -t msgguard/flywheel:staging .
+
+  deploy:
+    needs: [validate, docker-build]
+    if: secrets.KUBE_CONFIG != ''
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - uses: azure/setup-kubectl@v4
+      - run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+          helm upgrade --install msgguard deploy/helm/msgguard \
+            -f deploy/helm/msgguard/values-staging.yaml \
+            -f deploy/helm/msgguard/values-mongodb.yaml \
+            --set image.tag=staging-${{ github.sha }} \
+            --set auth.secret="${{ secrets.STAGING_AUTH_SECRET }}" \
+            -n msgguard-staging --create-namespace --wait --timeout 5m
+
+  smoke:
+    needs: [deploy]
+    if: secrets.STAGING_API_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf "${{ secrets.STAGING_API_URL }}/health" | grep -q ok

@@ -1,0 +1,41 @@
+name: Security
+
+on:
+  push:
+    branches: [main, master, staging]
+  pull_request:
+    branches: [main, master, staging]
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  gosec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+      - run: |
+          gosec -exclude-dir=vendor -severity medium -confidence medium \
+            ./pkg/... ./services/gateway/... ./services/model/... || true
+
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: |
+          cd apps/admin && npm ci && npm audit --audit-level=high || true
+
+  helm-secrets-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          ! grep -r 'msgguard-dev-secret' deploy/helm/msgguard/values-prod.yaml
+          ! grep -q 'CHANGE_ME_PROD_AUTH' deploy/helm/msgguard/values-prod.yaml && exit 0 || \
+            echo "::warning::values-prod.yaml still has CHANGE_ME placeholders (expected until ops configures secrets)"

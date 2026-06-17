@@ -1,0 +1,117 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag (default: git sha)'
+        required: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/msgguard
+
+jobs:
+  ml-gate:
+    runs-on: ubuntu-latest
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          pip install -r requirements.txt
+          make data train-all-locales export-all-locales benchmark
+        working-directory: ml
+
+  build-push:
+    needs: ml-gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="${GITHUB_REF_NAME#v}"
+          fi
+          if [ -z "$TAG" ] || [ "$TAG" = "$GITHUB_REF_NAME" ]; then
+            TAG="${GITHUB_SHA::12}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      - run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          for svc in gateway model flywheel; do
+            docker build -f deploy/Dockerfile.$svc -t ${{ env.IMAGE_PREFIX }}-$svc:$TAG -t ${{ env.IMAGE_PREFIX }}-$svc:latest .
+            docker push ${{ env.IMAGE_PREFIX }}-$svc:$TAG
+            docker push ${{ env.IMAGE_PREFIX }}-$svc:latest
+          done
+
+  helm-prod-validate:
+    needs: ml-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - run: |
+          helm template msgguard deploy/helm/msgguard \
+            -f deploy/helm/msgguard/values-prod.yaml \
+            --set auth.secret="prod-placeholder-secret-32-characters-min" \
+            --set security.authBootstrapEnabled=false \
+            --set security.modelDownloadAuth=true \
+            | grep -q msgguard-gateway
+
+  canary:
+    needs: [build-push]
+    if: secrets.STAGING_API_URL != '' && secrets.RELEASE_ADMIN_TOKEN != ''
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          pip install requests
+          python ml/scripts/canary_rollout.py \
+            --gateway "${{ secrets.STAGING_API_URL }}" \
+            --token "${{ secrets.RELEASE_ADMIN_TOKEN }}" \
+            --percentage 5
+
+  deploy-prod:
+    needs: [build-push, helm-prod-validate]
+    if: secrets.KUBE_CONFIG_PROD != ''
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG_PROD }}" | base64 -d > ~/.kube/config
+          TAG="${{ needs.build-push.outputs.tag }}"
+          helm upgrade --install msgguard deploy/helm/msgguard \
+            -f deploy/helm/msgguard/values-prod.yaml \
+            -f deploy/helm/msgguard/values-mtls.yaml \
+            --set image.tag="$TAG" \
+            --set auth.secret="${{ secrets.PROD_AUTH_SECRET }}" \
+            -n msgguard-prod --create-namespace --wait --timeout 10m

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
-import { fetchToken, getToken, setToken } from "./api";
+import { consumeTokenFromURL, fetchOIDCConfig, fetchToken, getToken, setToken } from "./api";
 import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
 import Models from "./pages/Models";
@@ -10,9 +10,14 @@ import Quota from "./pages/Quota";
 export default function App() {
   const [token, setTokenState] = useState(getToken());
   const [userId, setUserId] = useState("admin");
+  const [oidc, setOidc] = useState<{ enabled: boolean; login_url: string; enforce_admin: boolean } | null>(null);
 
   useEffect(() => {
+    consumeTokenFromURL();
     setTokenState(getToken());
+    fetchOIDCConfig()
+      .then(setOidc)
+      .catch(() => setOidc({ enabled: false, login_url: "", enforce_admin: false }));
   }, []);
 
   async function handleLogin() {
@@ -29,14 +34,23 @@ export default function App() {
     <>
       <div className="auth-bar">
         <strong>MsgGuard Admin</strong>
-        <input
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="user_id"
-        />
-        <button type="button" onClick={handleLogin}>
-          Get token (dev)
-        </button>
+        {oidc?.enabled && (
+          <a className="sso-btn" href={`${import.meta.env.VITE_GATEWAY_URL || "http://localhost:8080"}${oidc.login_url}`}>
+            Sign in with SSO
+          </a>
+        )}
+        {!oidc?.enforce_admin && (
+          <>
+            <input
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="user_id"
+            />
+            <button type="button" onClick={handleLogin}>
+              Get token (dev)
+            </button>
+          </>
+        )}
         <span className={token ? "" : "error"}>
           {token ? "Authenticated" : "No token — admin API calls will 401"}
         </span>

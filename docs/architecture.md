@@ -11,8 +11,8 @@ flowchart TB
   subgraph clients [Clients]
     iOS[iOS App + Filter Extension]
     macOS[macOS Mail Extension]
-    Android[Android - Planned]
-    AdminWeb[Admin Web - Phase 4]
+    Android[Android Skeleton]
+    AdminWeb[Admin Web SPA]
   end
 
   subgraph edge [Edge / CDN]
@@ -74,9 +74,9 @@ flowchart TB
 | Android | [client-android.md](architecture/client-android.md) | Planned |
 | Backend platform | [backend-platform.md](architecture/backend-platform.md) | Implemented |
 | ML flywheel | [ml-flywheel.md](architecture/ml-flywheel.md) | Implemented |
-| Auth & security | [auth-security.md](architecture/auth-security.md) | In Progress |
-| Commercial / tiers | [commercial.md](architecture/commercial.md) | In Progress |
-| Admin web | [admin-web.md](architecture/admin-web.md) | In Progress |
+| Auth & security | [auth-security.md](architecture/auth-security.md) | Implemented (prod secrets at deploy) |
+| Commercial / tiers | [commercial.md](architecture/commercial.md) | Implemented (Apple creds at deploy) |
+| Admin web | [admin-web.md](architecture/admin-web.md) | Implemented |
 
 ## Related
 

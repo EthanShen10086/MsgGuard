@@ -8,5 +8,20 @@ data:
   DATABASE_DSN: {{ .Values.database.dsn | quote }}
   AUTH_SECRET: {{ .Values.auth.secret | quote }}
   REDIS_URL: {{ .Values.redis.url | quote }}
+  MSGGUARD_ENV: {{ .Values.env | default "staging" | quote }}
+  AUTH_BOOTSTRAP_ENABLED: {{ .Values.security.authBootstrapEnabled | default false | quote }}
+  AUTH_DEVICE_TOKEN_ENABLED: {{ .Values.security.deviceTokenEnabled | default true | quote }}
+  MODEL_DOWNLOAD_AUTH_REQUIRED: {{ .Values.security.modelDownloadAuth | default false | quote }}
+  APP_ATTEST_REQUIRED: {{ .Values.security.appAttestRequired | default false | quote }}
+  OIDC_ISSUER: {{ .Values.oidc.issuer | quote }}
+  OIDC_CLIENT_ID: {{ .Values.oidc.clientId | quote }}
+  OIDC_CLIENT_SECRET: {{ .Values.oidc.clientSecret | quote }}
+  OIDC_REDIRECT_URL: {{ .Values.oidc.redirectUrl | quote }}
+  OIDC_ADMIN_EMAILS: {{ .Values.oidc.adminEmails | quote }}
+  OIDC_ADMIN_DOMAIN: {{ .Values.oidc.adminDomain | quote }}
+  OIDC_ENFORCE_ADMIN: {{ .Values.oidc.enforceAdmin | default false | quote }}
+  ADMIN_UI_URL: {{ .Values.oidc.adminUiUrl | quote }}
+  FLYWHEEL_MIN_INTERVAL: {{ .Values.flywheel.minInterval | default "1h" | quote }}
+  FLYWHEEL_MIN_BATCH: {{ .Values.flywheel.minBatch | default "10" | quote }}
   MTLS_ADMIN_REQUIRED: {{ .Values.security.mtlsAdminRequired | default false | quote }}
   MTLS_CLIENT_HEADER: {{ .Values.security.mtlsClientHeader | default "" | quote }}

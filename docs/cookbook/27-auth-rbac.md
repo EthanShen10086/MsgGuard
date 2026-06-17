@@ -40,7 +40,7 @@ curl localhost:8080/api/v1/feedback -H "Authorization: Bearer $TOKEN"
 ### Token issuance in production
 
 1. Do **not** expose bootstrap token endpoint publicly.
-2. Issue admin tokens via internal ops (VPN + mTLS) or future OIDC (Phase 10).
+2. Issue admin tokens via **OIDC SSO** (`/api/v1/auth/oidc/login`) or internal ops (VPN + mTLS).
 3. Admin web (`apps/admin`) expects pasted Bearer token — no bootstrap in prod build.
 
 ### Device vs admin

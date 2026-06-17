@@ -3,11 +3,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Chart.Name }}-ingress
-  {{- if .Values.ingress.mtls.enabled }}
   annotations:
+    {{- if .Values.ingress.mtls.enabled }}
     {{ .Values.ingress.mtls.authSecret | default "nginx.org/mtls-ca-secret" }}: {{ .Values.ingress.mtls.secretName | quote }}
     nginx.org/mtls-auth-type: "client-cert"
-  {{- end }}
+    {{- end }}
+    {{- if .Values.ingress.waf.enabled }}
+    {{- range $k, $v := .Values.ingress.waf.annotations }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+    {{- end }}
 spec:
   rules:
     - host: {{ .Values.ingress.host }}

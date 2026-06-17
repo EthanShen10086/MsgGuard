@@ -1,0 +1,55 @@
+name: iOS Beta (TestFlight)
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'ios | macos-mail'
+        required: true
+        default: ios
+        type: choice
+        options:
+          - ios
+          - macos-mail
+
+jobs:
+  testflight:
+    if: secrets.APP_STORE_CONNECT_API_KEY_ID != ''
+    runs-on: macos-15
+    environment: testflight
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      - run: |
+          cd fastlane
+          bundle install
+      - name: iOS TestFlight
+        if: inputs.platform == 'ios'
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+        run: |
+          cd fastlane && bundle exec fastlane ios beta
+      - name: macOS Mail TestFlight
+        if: inputs.platform == 'macos-mail'
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+        run: |
+          cd fastlane && bundle exec fastlane mac mail_testflight
+
+  skip-notice:
+    if: secrets.APP_STORE_CONNECT_API_KEY_ID == ''
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::notice::TestFlight skipped — configure APP_STORE_CONNECT_API_KEY_* secrets in GitHub Environments (testflight)."

@@ -66,6 +66,24 @@ paths:
       responses:
         "200":
           description: Token pair
+  /api/v1/auth/oidc/config:
+    get:
+      summary: OIDC SSO config for admin console
+      responses:
+        "200":
+          description: enabled flag and login URL
+  /api/v1/auth/oidc/login:
+    get:
+      summary: Redirect to identity provider (admin SSO)
+      responses:
+        "302":
+          description: redirect to IdP
+  /api/v1/auth/oidc/callback:
+    get:
+      summary: OIDC callback; redirects to admin UI with access_token
+      responses:
+        "302":
+          description: redirect to ADMIN_UI_URL
   /api/v1/admin/metrics/summary:
     get:
       summary: Product metrics summary (admin)
@@ -130,6 +148,113 @@ paths:
       responses:
         "201":
           description: registered
+  /api/v1/auth/device:
+    post:
+      summary: Issue device-scoped JWT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id: { type: string }
+                platform: { type: string }
+      responses:
+        "200":
+          description: Device token pair
+        "403":
+          description: device token disabled
+  /api/v1/entitlements/verify:
+    post:
+      summary: Verify App Store signed transaction and link subscription
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signed_transaction: { type: string }
+                device_id: { type: string }
+      responses:
+        "200":
+          description: Entitlement active
+        "401":
+          description: unauthorized
+  /api/v1/entitlements/status:
+    get:
+      summary: Subscription status for device
+      parameters:
+        - name: device_id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Subscription state
+  /api/v1/webhooks/appstore:
+    post:
+      summary: App Store Server Notifications V2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signedPayload: { type: string }
+      responses:
+        "200":
+          description: accepted
+  /api/v1/privacy/me:
+    delete:
+      summary: Delete user data (GDPR)
+      security:
+        - BearerAuth: []
+      responses:
+        "204":
+          description: deleted
+        "401":
+          description: unauthorized
+  /api/v1/admin/models/promote:
+    post:
+      summary: Promote model version to production
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: promoted
+  /api/v1/admin/models/rollback:
+    post:
+      summary: Roll back model to previous version
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: rolled back
+  /api/v1/admin/flags:
+    get:
+      summary: List feature flags
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: flags
+    put:
+      summary: Update feature flag
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: updated
+  /api/v1/admin/quota/whitelist:
+    post:
+      summary: Add device to AI quota whitelist
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: whitelisted
 components:
   securitySchemes:
     BearerAuth:

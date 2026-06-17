@@ -6,18 +6,23 @@ import (
 	"strings"
 )
 
-// OIDCConfigured reports whether OIDC middleware is fully wired (stub: never true).
+// OIDCConfigured reports whether OIDC client credentials are present.
 func OIDCConfigured() bool {
-	return os.Getenv("OIDC_CLIENT_ID") != "" && os.Getenv("OIDC_CLIENT_SECRET") != ""
+	return strings.TrimSpace(os.Getenv("OIDC_ISSUER")) != "" &&
+		strings.TrimSpace(os.Getenv("OIDC_CLIENT_ID")) != "" &&
+		os.Getenv("OIDC_CLIENT_SECRET") != ""
 }
 
-// OIDCMiddleware is a placeholder for enterprise SSO.
-// When OIDC_ISSUER is set but client credentials are missing, protected routes return 501.
-func OIDCMiddleware(prefixes ...string) func(http.Handler) http.Handler {
-	issuer := strings.TrimSpace(os.Getenv("OIDC_ISSUER"))
+// OIDCEnforceAdmin blocks bootstrap token on admin routes when OIDC_ENFORCE_ADMIN=true.
+func OIDCEnforceAdmin() bool {
+	return os.Getenv("OIDC_ENFORCE_ADMIN") == "true"
+}
+
+// OIDCMiddleware optionally requires OIDC to be configured before serving admin prefixes.
+func OIDCMiddleware(provider *OIDCProvider, prefixes ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if issuer == "" {
+			if provider == nil || !provider.EnforceAdmin() {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -25,8 +30,8 @@ func OIDCMiddleware(prefixes ...string) func(http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-			if !OIDCConfigured() {
-				http.Error(w, "OIDC issuer configured but OIDC middleware not implemented", http.StatusNotImplemented)
+			if !provider.Enabled() {
+				http.Error(w, "OIDC required for admin but not configured", http.StatusServiceUnavailable)
 				return
 			}
 			next.ServeHTTP(w, r)

@@ -9,6 +9,24 @@ export function setToken(token: string): void {
   sessionStorage.setItem(TOKEN_KEY, token);
 }
 
+export function consumeTokenFromURL(): void {
+  const params = new URLSearchParams(window.location.search);
+  const t = params.get("access_token");
+  if (!t) return;
+  setToken(t);
+  params.delete("access_token");
+  const next = params.toString() ? `?${params}` : window.location.pathname;
+  window.history.replaceState({}, "", next);
+}
+
+export async function fetchOIDCConfig(): Promise<{
+  enabled: boolean;
+  login_url: string;
+  enforce_admin: boolean;
+}> {
+  return request("/api/v1/auth/oidc/config");
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   const token = getToken();
