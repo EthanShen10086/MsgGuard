@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
       - name: Read voxera-kit pin
@@ -126,7 +126,7 @@ jobs:
         with:
           name: ml-output
           path: ml/output
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
       - uses: actions/setup-python@v5
