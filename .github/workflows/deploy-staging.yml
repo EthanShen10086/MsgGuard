@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: azure/setup-helm@v4
-      - uses: azure/setup-kubectl@v4
+      - uses: azure/setup-kubectl@v5
       - name: Deploy to staging (optional)
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
