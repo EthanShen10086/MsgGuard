@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - run: |
           helm template msgguard deploy/helm/msgguard | grep -q Deployment
           helm template msgguard deploy/helm/msgguard -f deploy/helm/msgguard/values-mongodb.yaml | grep -q mongodb
@@ -118,7 +118,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - name: Read voxera-kit pin
         id: kitpin
         run: echo "sha=$(cat .github/voxera-kit-pin)" >> "$GITHUB_OUTPUT"
