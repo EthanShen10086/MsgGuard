@@ -90,12 +90,15 @@ jobs:
     steps:
       - uses: sigstore/cosign-installer@v3
       - name: Sign container images
-        if: ${{ secrets.COSIGN_PRIVATE_KEY != '' }}
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           TAG: ${{ needs.build-push.outputs.tag }}
         run: |
+          if [ -z "$COSIGN_PRIVATE_KEY" ]; then
+            echo "::notice::Cosign skipped — set COSIGN_PRIVATE_KEY secret."
+            exit 0
+          fi
           for svc in gateway model flywheel; do
             cosign sign --yes "${{ env.IMAGE_PREFIX }}-${svc}:${TAG}"
           done
