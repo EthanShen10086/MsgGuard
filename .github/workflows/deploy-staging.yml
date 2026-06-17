@@ -34,27 +34,40 @@ jobs:
 
   deploy:
     needs: [validate, docker-build]
-    if: secrets.KUBE_CONFIG != ''
     runs-on: ubuntu-latest
     environment: staging
     steps:
       - uses: actions/checkout@v4
       - uses: azure/setup-helm@v4
       - uses: azure/setup-kubectl@v4
-      - run: |
+      - name: Deploy to staging (optional)
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          STAGING_AUTH_SECRET: ${{ secrets.STAGING_AUTH_SECRET }}
+        run: |
+          if [ -z "$KUBE_CONFIG" ]; then
+            echo "::notice::Staging deploy skipped — set KUBE_CONFIG secret."
+            exit 0
+          fi
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+          echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
           helm upgrade --install msgguard deploy/helm/msgguard \
             -f deploy/helm/msgguard/values-staging.yaml \
             -f deploy/helm/msgguard/values-mongodb.yaml \
             --set image.tag=staging-${{ github.sha }} \
-            --set auth.secret="${{ secrets.STAGING_AUTH_SECRET }}" \
+            --set auth.secret="${STAGING_AUTH_SECRET:-staging-placeholder-secret-32chars-min}" \
             -n msgguard-staging --create-namespace --wait --timeout 5m
 
   smoke:
     needs: [deploy]
-    if: secrets.STAGING_API_URL != ''
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          curl -sf "${{ secrets.STAGING_API_URL }}/health" | grep -q ok
+      - name: Staging smoke (optional)
+        env:
+          STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
+        run: |
+          if [ -z "$STAGING_API_URL" ]; then
+            echo "::notice::Smoke skipped — set STAGING_API_URL secret."
+            exit 0
+          fi
+          curl -sf "$STAGING_API_URL/health" | grep -q ok

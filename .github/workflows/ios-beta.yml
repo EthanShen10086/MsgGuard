@@ -14,20 +14,30 @@ on:
 
 jobs:
   testflight:
-    if: secrets.APP_STORE_CONNECT_API_KEY_ID != ''
     runs-on: macos-15
     environment: testflight
     steps:
       - uses: actions/checkout@v4
+      - name: Check ASC secrets
+        id: asc
+        run: |
+          if [ -z "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::TestFlight skipped — configure APP_STORE_CONNECT_API_KEY_* in GitHub Environment (testflight)."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: ruby/setup-ruby@v1
+        if: steps.asc.outputs.configured == 'true'
         with:
           ruby-version: '3.2'
           bundler-cache: true
       - run: |
           cd fastlane
           bundle install
+        if: steps.asc.outputs.configured == 'true'
       - name: iOS TestFlight
-        if: inputs.platform == 'ios'
+        if: steps.asc.outputs.configured == 'true' && inputs.platform == 'ios'
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
@@ -37,7 +47,7 @@ jobs:
         run: |
           cd fastlane && bundle exec fastlane ios beta
       - name: macOS Mail TestFlight
-        if: inputs.platform == 'macos-mail'
+        if: steps.asc.outputs.configured == 'true' && inputs.platform == 'macos-mail'
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
@@ -46,10 +56,3 @@ jobs:
           FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
         run: |
           cd fastlane && bundle exec fastlane mac mail_testflight
-
-  skip-notice:
-    if: secrets.APP_STORE_CONNECT_API_KEY_ID == ''
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "::notice::TestFlight skipped — configure APP_STORE_CONNECT_API_KEY_* secrets in GitHub Environments (testflight)."
