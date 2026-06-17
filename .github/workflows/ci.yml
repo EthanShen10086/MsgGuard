@@ -53,9 +53,12 @@ jobs:
           cd "$GITHUB_WORKSPACE/pkg/httpauth" && go test -race ./...
           cd "$GITHUB_WORKSPACE/services/gateway/internal/handler" && go test -race ./...
       - name: Go build all services
+        env:
+          GOWORK: ${{ github.workspace }}/go.work
         run: |
           for svc in gateway model admin rules classify feedback flywheel; do
-            (cd "services/$svc" && go mod tidy && go build ./...)
+            echo "=== build $svc ==="
+            (cd "services/$svc" && go build ./...)
           done
           for pkg in app adapters httpauth; do
             (cd "pkg/$pkg" && go build ./...)

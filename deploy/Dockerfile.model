@@ -1,9 +1,13 @@
 FROM golang:1.25-alpine AS builder
+RUN apk add --no-cache git
+ARG VOXERA_KIT_SHA=58be0db49ee7623b0d05a9df2b0fefcc0d73f6d2
+RUN git clone https://github.com/EthanShen10086/voxera-kit.git /voxera-kit \
+    && cd /voxera-kit && git checkout "${VOXERA_KIT_SHA}"
 WORKDIR /src
-COPY go.work go.work.sum ./
 COPY pkg ./pkg
 COPY services/model ./services/model
 WORKDIR /src/services/model
+ENV GOWORK=off
 RUN go build -o /model ./cmd/server
 
 FROM alpine:3.20

@@ -65,8 +65,11 @@ jobs:
       - run: |
           TAG="${{ steps.meta.outputs.tag }}"
           PREFIX="${{ steps.meta.outputs.image_prefix }}"
+          KIT_SHA=$(cat .github/voxera-kit-pin)
           for svc in gateway model flywheel; do
-            docker build -f deploy/Dockerfile.$svc -t ${PREFIX}-$svc:$TAG -t ${PREFIX}-$svc:latest .
+            docker build -f deploy/Dockerfile.$svc \
+              --build-arg VOXERA_KIT_SHA="$KIT_SHA" \
+              -t ${PREFIX}-$svc:$TAG -t ${PREFIX}-$svc:latest .
             docker push ${PREFIX}-$svc:$TAG
             docker push ${PREFIX}-$svc:latest
           done
