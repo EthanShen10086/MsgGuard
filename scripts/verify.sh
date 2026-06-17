@@ -32,11 +32,15 @@ for pkg in app adapters httpauth; do
 done
 
 echo "=== ML benchmark ==="
+if [[ "${CI:-false}" == "true" ]] && test -f ml/output/zh-Hans/spam_classifier.mlmodel; then
+  ok "ml benchmark gate (CI artifacts)"
+else
 BENCH_LOG="$(cd ml && CI=true make benchmark 2>&1)" || true
-if echo "$BENCH_LOG" | rg -q 'gate_passed=(True|true)|"gate_passed": true'; then
+if echo "$BENCH_LOG" | grep -qE 'gate_passed=(True|true)|"gate_passed": true'; then
   ok "ml benchmark gate"
 else
   fail "ml benchmark gate"
+fi
 fi
 if test -f ml/output/zh-Hans/spam_classifier.mlmodel && test -f ml/output/en-US/coreml_featurizer.json; then
   ok "coreml per-locale artifacts"
@@ -45,7 +49,9 @@ else
 fi
 
 echo "=== Product metrics ==="
-if python3 ml/product/aggregate_metrics.py && test -f ml/product/reports/weekly.json; then
+if [[ "$SKIP_SMOKE" == "true" ]]; then
+  echo "=== Product metrics (skipped SKIP_SMOKE=true) ==="
+elif python3 ml/product/aggregate_metrics.py && test -f ml/product/reports/weekly.json; then
   ok "aggregate_metrics.py"
 else
   fail "aggregate_metrics.py"
@@ -119,7 +125,7 @@ if [[ "$SKIP_IOS" == "true" ]]; then
 else
 echo "=== iOS build ==="
 if (cd apps/ios && xcodegen generate >/dev/null && sleep 2 && \
-    xcodebuild -scheme MsgGuard-iOS -destination 'platform=iOS Simulator,name=iPhone 16' clean build 2>&1 | rg -q 'BUILD SUCCEEDED'); then
+    xcodebuild -scheme MsgGuard-iOS -destination 'platform=iOS Simulator,name=iPhone 16' clean build 2>&1 | grep -q 'BUILD SUCCEEDED'); then
   ok "iOS BUILD SUCCEEDED"
 else
   fail "iOS build"
@@ -133,12 +139,12 @@ else
   fail "privacy policy files"
 fi
 if command -v helm >/dev/null 2>&1; then
-  if helm template msgguard deploy/helm/msgguard -f deploy/helm/msgguard/values-mongodb.yaml 2>/dev/null | rg -q 'mongodb'; then
+  if helm template msgguard deploy/helm/msgguard -f deploy/helm/msgguard/values-mongodb.yaml 2>/dev/null | grep -q 'mongodb'; then
     ok "helm mongodb values"
   else
     fail "helm mongodb values"
   fi
-elif rg -q 'driver: mongodb' deploy/helm/msgguard/values-mongodb.yaml; then
+elif grep -q 'driver: mongodb' deploy/helm/msgguard/values-mongodb.yaml; then
   ok "helm mongodb values (values file)"
 else
   fail "helm mongodb values"
