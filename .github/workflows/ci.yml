@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, master, staging]
 
+env:
+  VOXERA_KIT_SHA: c0375208a50f03c705ee45e0ab9893d3c2aef98e
+
 jobs:
   swift-packages:
     runs-on: macos-15
@@ -30,23 +33,30 @@ jobs:
       - run: |
           xcodebuild -project apps/macos/MsgGuard-macOS.xcodeproj -scheme MsgGuardMailHost -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
 
-  go-gateway:
+  go-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
-      - run: |
-          git clone --depth 1 https://github.com/EthanShen10086/voxera-kit.git ../voxera-kit || true
-      - run: |
-          cd pkg/adapters && go mod tidy && go build ./...
-          cd ../httpauth && go build ./... && go test ./...
-          cd ../app && go build ./...
-          cd ../../services/gateway && go mod tidy && go build ./cmd/server
-          cd ../model && go build ./cmd/server
-          cd ../admin && go build ./cmd/server
-          cd ../flywheel && go build ./cmd/worker
+      - name: Checkout voxera-kit (pinned)
+        run: |
+          git clone https://github.com/EthanShen10086/voxera-kit.git ../voxera-kit
+          cd ../voxera-kit && git checkout "${VOXERA_KIT_SHA}"
+      - name: Go test (race)
+        run: |
+          cd pkg/adapters/memory && go test -race ./...
+          cd ../../httpauth && go test -race ./...
+          cd ../../../services/gateway/internal/handler && go test -race ./...
+      - name: Go build all services
+        run: |
+          for svc in gateway model admin rules classify feedback flywheel; do
+            (cd "services/$svc" && go mod tidy && go build ./...)
+          done
+          for pkg in app adapters httpauth; do
+            (cd "pkg/$pkg" && go build ./...)
+          done
 
   admin-web:
     runs-on: ubuntu-latest
@@ -78,13 +88,37 @@ jobs:
           python-version: "3.11"
       - run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt pytest
           make data
           make train-all-locales
           make export-all-locales
           make benchmark
+          pytest benchmark/test_gate.py -q
         working-directory: ml
       - run: |
           test -f ml/output/zh-Hans/spam_classifier.mlmodel
           test -f ml/output/en-US/spam_classifier.mlmodel
           test $(stat -c%s ml/output/zh-Hans/spam_classifier.mlmodel) -gt 512
+
+  verify:
+    needs: [go-test, ml-benchmark, helm-template]
+    runs-on: ubuntu-latest
+    env:
+      CI: "true"
+      SKIP_IOS: "true"
+      SKIP_SMOKE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: azure/setup-helm@v4
+      - name: Checkout voxera-kit (pinned)
+        run: |
+          git clone https://github.com/EthanShen10086/voxera-kit.git ../voxera-kit
+          cd ../voxera-kit && git checkout "${VOXERA_KIT_SHA}"
+      - run: pip install -r requirements.txt
+      - run: bash scripts/verify.sh

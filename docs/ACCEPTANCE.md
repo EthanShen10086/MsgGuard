@@ -92,13 +92,23 @@
 - [x] Mail extension invokeAgainWithBody + RFC822 body parsing
 
 ## Phase 3 — Backend Platform Acceptance
-- [ ] `cd services/gateway && go build ./cmd/server` → success
-- [ ] `curl localhost:8080/health` → `ok`
-- [ ] `curl localhost:8080/metrics` → Prometheus text
-- [ ] `POST /api/v1/feedback` with device or Bearer → JSON id
-- [ ] `GET /api/v1/rules/latest` → rule bundle JSON with version + checksum
-- [ ] `GET /api/v1/models/latest` → model metadata (locale optional)
-- [ ] `./deploy/tiers/tier1-compose.sh` → gateway + postgres + caddy-site up
-- [ ] `helm template msgguard deploy/helm/msgguard` → Deployment YAML without errors
-- [ ] Gateway uses `pkg/app/container.go` — stores switchable via `DATABASE_DRIVER`
-- [ ] AASA template present under `deploy/` for universal links
+- [x] `cd services/gateway && go build ./cmd/server` → success
+- [x] `curl localhost:8080/health` → `ok`
+- [x] `curl localhost:8080/metrics` → Prometheus text
+- [x] `POST /api/v1/feedback` with device or Bearer → JSON id
+- [x] `GET /api/v1/rules/latest` → rule bundle JSON with version + checksum
+- [x] `GET /api/v1/models/latest` → model metadata (locale optional)
+- [x] `./deploy/tiers/tier1-compose.sh` → gateway + postgres + caddy-site up
+- [x] `helm template msgguard deploy/helm/msgguard` → Deployment YAML without errors
+- [x] Gateway uses `pkg/app/container.go` — stores switchable via `DATABASE_DRIVER`
+- [x] AASA template present under `deploy/` for universal links
+
+## Phase 4 — Repository Governance (2026-06)
+- [x] `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`
+- [x] `.github/CODEOWNERS`, `dependabot.yml`, `ISSUE_TEMPLATE`
+- [x] `scripts/verify.sh` in CI (`verify` job, `SKIP_IOS`/`SKIP_SMOKE` on Linux)
+- [x] Go unit tests: `pkg/adapters/memory`, `pkg/httpauth`, `services/gateway/internal/handler`
+- [x] `ml/benchmark/test_gate.py` pytest in CI
+- [x] `docs/adr/` (ADR-001–003), `docs/api/VERSIONING.md`, `docs/sre/ONCALL.md`
+- [x] Security workflow: gosec/npm audit fail on findings (no `|| true`)
+- [x] Release: SBOM + GitHub Release + optional cosign; voxera-kit pinned SHA

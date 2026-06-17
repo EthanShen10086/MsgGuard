@@ -5,6 +5,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# CI can skip slow/macOS-only sections (see .github/workflows/ci.yml verify job).
+SKIP_IOS="${SKIP_IOS:-false}"
+SKIP_SMOKE="${SKIP_SMOKE:-false}"
+
 PASS=0
 FAIL=0
 
@@ -47,6 +51,9 @@ else
   fail "aggregate_metrics.py"
 fi
 
+if [[ "$SKIP_SMOKE" == "true" ]]; then
+  echo "=== Gateway smoke (skipped SKIP_SMOKE=true) ==="
+else
 echo "=== Gateway smoke (auth + model auth) ==="
 GWPID=""
 MODELPID=""
@@ -105,13 +112,18 @@ if [[ "$REG_OK" == "201" ]]; then
 else
   fail "model register with token → expected 201 got $REG_OK"
 fi
+fi
 
+if [[ "$SKIP_IOS" == "true" ]]; then
+  echo "=== iOS build (skipped SKIP_IOS=true) ==="
+else
 echo "=== iOS build ==="
 if (cd apps/ios && xcodegen generate >/dev/null && sleep 2 && \
     xcodebuild -scheme MsgGuard-iOS -destination 'platform=iOS Simulator,name=iPhone 16' clean build 2>&1 | rg -q 'BUILD SUCCEEDED'); then
   ok "iOS BUILD SUCCEEDED"
 else
   fail "iOS build"
+fi
 fi
 
 echo "=== Helm + legal ==="

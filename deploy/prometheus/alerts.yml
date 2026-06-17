@@ -69,3 +69,23 @@ groups:
         annotations:
           summary: "Gateway availability below 99.5% over 1h"
           description: "SLO error budget burning; see docs/sre/SLO.md"
+
+      - alert: SLOErrorBudgetBurnFast
+        expr: |
+          (1 - avg_over_time(up{job="msgguard-gateway"}[5m])) > 0.0025
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Fast SLO burn — 5m window"
+          description: ">50% monthly error budget consumed in 5m at 99.5% SLO; page on-call per docs/sre/ONCALL.md"
+
+      - alert: SLOErrorBudgetBurnSlow
+        expr: |
+          (1 - avg_over_time(up{job="msgguard-gateway"}[6h])) > 0.001
+        for: 6h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow SLO burn — 6h window"
+          description: "Sustained availability dip; review deploys and dependencies"

@@ -13,6 +13,11 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/msgguard
@@ -35,9 +40,6 @@ jobs:
   build-push:
     needs: ml-gate
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
     steps:
@@ -65,6 +67,54 @@ jobs:
             docker push ${{ env.IMAGE_PREFIX }}-$svc:$TAG
             docker push ${{ env.IMAGE_PREFIX }}-$svc:latest
           done
+
+  sbom:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ needs.build-push.outputs.tag }}
+          path: sbom.spdx.json
+
+  cosign:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: sigstore/cosign-installer@v3
+      - name: Sign container images
+        if: ${{ secrets.COSIGN_PRIVATE_KEY != '' }}
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          TAG: ${{ needs.build-push.outputs.tag }}
+        run: |
+          for svc in gateway model flywheel; do
+            cosign sign --yes "${{ env.IMAGE_PREFIX }}-${svc}:${TAG}"
+          done
+
+  github-release:
+    needs: [build-push, sbom]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: sbom-${{ needs.build-push.outputs.tag }}
+          path: release-assets
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-assets/sbom.spdx.json
 
   helm-prod-validate:
     needs: ml-gate

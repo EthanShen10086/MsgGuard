@@ -19,7 +19,7 @@ jobs:
       - run: go install github.com/securego/gosec/v2/cmd/gosec@latest
       - run: |
           gosec -exclude-dir=vendor -severity medium -confidence medium \
-            ./pkg/... ./services/gateway/... ./services/model/... || true
+            ./pkg/... ./services/gateway/... ./services/model/...
 
   npm-audit:
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: "20"
       - run: |
-          cd apps/admin && npm ci && npm audit --audit-level=high || true
+          cd apps/admin && npm ci && npm audit --audit-level=high
 
   helm-secrets-check:
     runs-on: ubuntu-latest
