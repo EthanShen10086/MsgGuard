@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - run: |
           helm template msgguard deploy/helm/msgguard \
             -f deploy/helm/msgguard/values-staging.yaml \
@@ -38,7 +38,7 @@ jobs:
     environment: staging
     steps:
       - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - uses: azure/setup-kubectl@v4
       - name: Deploy to staging (optional)
         env:

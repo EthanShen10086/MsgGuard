@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - run: |
           helm template msgguard deploy/helm/msgguard \
             -f deploy/helm/msgguard/values-prod.yaml \
@@ -170,7 +170,7 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - name: Deploy to production (optional)
         env:
           KUBE_CONFIG_PROD: ${{ secrets.KUBE_CONFIG_PROD }}
